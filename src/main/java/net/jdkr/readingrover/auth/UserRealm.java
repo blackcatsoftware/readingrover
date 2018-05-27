@@ -1,8 +1,7 @@
 package net.jdkr.readingrover.auth;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,18 +15,19 @@ import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.codec.Base64;
-import org.apache.shiro.crypto.RandomNumberGenerator;
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.apache.shiro.util.SimpleByteSource;
-import org.jimmutable.core.objects.Builder;
+import org.jimmutable.cloud.CloudExecutionEnvironment;
+import org.jimmutable.cloud.servlet_utils.search.OneSearchResultWithTyping;
+import org.jimmutable.cloud.servlet_utils.search.StandardSearchRequest;
 import org.jimmutable.core.objects.common.ObjectId;
 import org.jimmutable.core.utils.Normalizer;
 
 import net.jdkr.readingrover.user.User;
+import net.jdkr.readingrover.util.StorageUtil;
 
 
 public class UserRealm extends AuthorizingRealm
@@ -36,86 +36,6 @@ public class UserRealm extends AuthorizingRealm
 
     static private final String REALM_NAME = "rover-users";
 
-    
-    static private User createJeff()
-    {
-        Builder builder = new Builder(User.TYPE_NAME);
-        
-        builder.set(User.FIELD_ID, ObjectId.createRandomId());
-        
-        builder.set(User.FIELD_USERNAME, "jdezso");
-        builder.set(User.FIELD_EMAIL_ADDRESS, "jdezso@gmail.com");
-        
-        // TODO Create util for salting/hashing passwords
-        RandomNumberGenerator rng = new SecureRandomNumberGenerator();
-        ByteSource salt = rng.nextBytes();
-        
-        String hashed_password = new Sha512Hash("password", salt, 1024).toBase64();
-        
-        builder.set(User.FIELD_PASSWORD_HASH, hashed_password);
-        builder.set(User.FIELD_PASSWORD_SALT, salt.toBase64());
-        
-        return builder.create(null);
-    }
-    
-    static private User createKristen()
-    {
-        Builder builder = new Builder(User.TYPE_NAME);
-        
-        builder.set(User.FIELD_ID, ObjectId.createRandomId());
-        
-        builder.set(User.FIELD_USERNAME, "christy1865");
-        builder.set(User.FIELD_EMAIL_ADDRESS, "k.r.richter@gmail.com");
-        
-        // TODO Create util for salting/hashing passwords
-        RandomNumberGenerator rng = new SecureRandomNumberGenerator();
-        ByteSource salt = rng.nextBytes();
-        
-        String hashed_password = new Sha512Hash("password", salt, 1024).toBase64();
-        
-        builder.set(User.FIELD_PASSWORD_HASH, hashed_password);
-        builder.set(User.FIELD_PASSWORD_SALT, salt.toBase64());
-        
-        return builder.create(null);
-    }
-    
-    static private User createHaley()
-    {
-        Builder builder = new Builder(User.TYPE_NAME);
-        
-        builder.set(User.FIELD_ID, ObjectId.createRandomId());
-        
-        builder.set(User.FIELD_USERNAME, "haleybug");
-        
-        // TODO Create util for salting/hashing passwords
-        RandomNumberGenerator rng = new SecureRandomNumberGenerator();
-        ByteSource salt = rng.nextBytes();
-        
-        String hashed_password = new Sha512Hash("password", salt, 1024).toBase64();
-        
-        builder.set(User.FIELD_PASSWORD_HASH, hashed_password);
-        builder.set(User.FIELD_PASSWORD_SALT, salt.toBase64());
-        
-        return builder.create(null);
-    }
-    
-    // TODO Use Storage instead of RAM!
-    static private final Map<String, User> USERS;
-    static
-    {
-        Map<String, User> users = new HashMap<>();
-        
-        User jeff = createJeff();
-        users.put(jeff.getSimpleUsername(), jeff);
-        
-        User kristen = createKristen();
-        users.put(kristen.getSimpleUsername(), kristen);
-        
-        User haley = createHaley();
-        users.put(haley.getSimpleUsername(), haley);
-        
-        USERS = Collections.unmodifiableMap(users);
-    }
     
     static private CredentialsMatcher createCredentialsMatcher()
     {
@@ -144,7 +64,15 @@ public class UserRealm extends AuthorizingRealm
         
         String username = Normalizer.lowerCase(user_token.getUsername());
         
-        User user = USERS.get(username);
+        String query = String.format("%s:\"%s\"", User.SEARCH_FIELD_USERNAME.getSimpleFieldName().getSimpleName(), username);
+        StandardSearchRequest search_request = new StandardSearchRequest(query);
+        
+        List<OneSearchResultWithTyping> results = CloudExecutionEnvironment.getSimpleCurrent().getSimpleSearch().search(User.INDEX_DEFINITION, search_request, Collections.emptyList());
+        if (results.isEmpty()) return null;
+        
+        ObjectId id = new ObjectId(results.get(0).readAsAtom(User.SEARCH_FIELD_ID.getSimpleFieldName(), null));
+        
+        User user = StorageUtil.getComplexCurrentVersion(User.KIND, id, null);
         if (null == user) return null;
         
         ByteSource salt = new SimpleByteSource(Base64.decode(user.getSimplePasswordSalt()));

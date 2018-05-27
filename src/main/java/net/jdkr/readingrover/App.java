@@ -28,6 +28,7 @@ import org.jimmutable.cloud.EnvironmentType;
 import org.jimmutable.cloud.utils.AppAdminUtil;
 
 import net.jdkr.readingrover.auth.DoLogin;
+import net.jdkr.readingrover.user.DoUserSignup;
 import net.jdkr.readingrover.util.Log4jOneUtil;
 import net.jdkr.readingrover.util.ViewController;
 
@@ -57,6 +58,9 @@ public class App
         
         ACTION_MAPPINGS.put("/public/do-login", DoLogin.class);
 //        ACTION_MAPPINGS.put("/index/index/do-redirect", DoIndexRedirect.class);
+        
+        ACTION_MAPPINGS.put("/public/users/do-signup", DoUserSignup.class);
+//        ACTION_MAPPINGS.put("/public/users/check-username", DoCheckUsername.class);
     }
     
     static public class ServletSpecForwardUri
@@ -109,7 +113,7 @@ public class App
             CloudExecutionEnvironment.startup(APP_ID, type);
         }
         
-        // note:this is required beforehand
+        // Do this first
         TypeNameRegister.registerAllTypes();
         TypeNameRegister.registerAllIndexableKinds();
         
@@ -121,6 +125,9 @@ public class App
         }
         
         Log4jOneUtil.setupListeners();
+
+        DevStartupData.upsertAllStartupData();
+
         
         // Creating the server on port 8080
         Server server = new Server(8080);
