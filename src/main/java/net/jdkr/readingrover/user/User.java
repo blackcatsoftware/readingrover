@@ -22,6 +22,7 @@ import org.jimmutable.core.serialization.TypeName;
 import org.jimmutable.core.serialization.reader.ObjectParseTree;
 import org.jimmutable.core.serialization.writer.ObjectWriter;
 import org.jimmutable.core.utils.Comparison;
+import org.jimmutable.core.utils.Normalizer;
 import org.jimmutable.core.utils.Optional;
 import org.jimmutable.core.utils.Validator;
 
@@ -79,7 +80,7 @@ public class User extends StandardImmutableObject<User> implements Storable, Ind
     
     private ObjectId id; // Required
     
-    private String username; // Required
+    private String username; // Required, lowercase
     private String email_address; // Optional
     
     private String password_hash; // Required
@@ -124,7 +125,7 @@ public class User extends StandardImmutableObject<User> implements Storable, Ind
     @Override
     public void normalize()
     {
-        // Nothing to do
+        username = Normalizer.lowerCase(username);
     }
 
     @Override

@@ -5,6 +5,8 @@ import org.jimmutable.cloud.elasticsearch.SearchSync;
 import org.jimmutable.core.serialization.JimmutableTypeNameRegister;
 import org.jimmutable.core.serialization.reader.ObjectParseTree;
 
+import net.jdkr.readingrover.auth.LoginResponseFailure;
+import net.jdkr.readingrover.auth.LoginResponseOK;
 import net.jdkr.readingrover.user.User;
 
 
@@ -17,6 +19,8 @@ public class TypeNameRegister
 	    JimmutableCloudTypeNameRegister.registerAllTypes();
 	    
 	    ObjectParseTree.registerTypeName(User.class);
+        ObjectParseTree.registerTypeName(LoginResponseOK.class);
+        ObjectParseTree.registerTypeName(LoginResponseFailure.class);
 	}
 	
     static public void registerAllIndexableKinds()

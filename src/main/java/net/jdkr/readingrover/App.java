@@ -3,21 +3,22 @@ package net.jdkr.readingrover;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServlet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.shiro.web.env.EnvironmentLoaderListener;
+import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.jimmutable.cloud.ApplicationId;
@@ -26,20 +27,21 @@ import org.jimmutable.cloud.DefaultJetty2Log4j2Bridge;
 import org.jimmutable.cloud.EnvironmentType;
 import org.jimmutable.cloud.utils.AppAdminUtil;
 
+import net.jdkr.readingrover.auth.DoLogin;
 import net.jdkr.readingrover.util.Log4jOneUtil;
 import net.jdkr.readingrover.util.ViewController;
 
 
 public class App
 {
-    static private final Logger logger = LogManager.getLogger(App.class);
+    static private final Logger LOGGER = LogManager.getLogger(App.class);
+    
+    static public final ApplicationId APP_ID = new ApplicationId("reading-rover");
+    
     static private final int MAX_FORM_SIZE = 1024 * 1024 * 1024; // ~1074 MB
     
     static public final Map<String, ServletSpecForwardUri> VIEW_MAPPINGS;
-    static public final Set<String> PAGES_AVAILABLE_TO_ALL_AUTHENTICATED_USERS;
-    
     static public final Map<String, Class<? extends HttpServlet>> ACTION_MAPPINGS;
-    static public final ApplicationId APP_ID = new ApplicationId("reading-rover");
     
     static
     {
@@ -51,25 +53,9 @@ public class App
     
     static
     {
-        // Add any URLs here that are only available to users once authenticated but are
-        // not RWS staff
-        PAGES_AVAILABLE_TO_ALL_AUTHENTICATED_USERS = new HashSet<>();
-        PAGES_AVAILABLE_TO_ALL_AUTHENTICATED_USERS.add("/index");
-        PAGES_AVAILABLE_TO_ALL_AUTHENTICATED_USERS.add("/dealer-program/manage-advertising");
-        PAGES_AVAILABLE_TO_ALL_AUTHENTICATED_USERS.add("/dealer-program/select-business-to-manage");
-        PAGES_AVAILABLE_TO_ALL_AUTHENTICATED_USERS.add("/dealer-program/no-business-to-manage");
-        
-        PAGES_AVAILABLE_TO_ALL_AUTHENTICATED_USERS.add("/avatars/do-get");
-        PAGES_AVAILABLE_TO_ALL_AUTHENTICATED_USERS.add("/favicon.ico");
-        PAGES_AVAILABLE_TO_ALL_AUTHENTICATED_USERS.add("/attachments/do-get");
-        
-    }
-    
-    static
-    {
         ACTION_MAPPINGS = new HashMap<>();
         
-//        ACTION_MAPPINGS.put("/public/do-login", DoLogin.class);
+        ACTION_MAPPINGS.put("/public/do-login", DoLogin.class);
 //        ACTION_MAPPINGS.put("/index/index/do-redirect", DoIndexRedirect.class);
     }
     
@@ -114,12 +100,12 @@ public class App
         EnvironmentType type = CloudExecutionEnvironment.getEnvironmentTypeFromSystemProperty(null);
         if (type == null)
         {
-            logger.info("No environment type was passed in with flag: -DJIMMUTABLE_ENV_TYPE, defaulting to DEV environment. See environment type options in the class EnvironmentType");
+            LOGGER.info("No environment type was passed in with flag: -DJIMMUTABLE_ENV_TYPE, defaulting to DEV environment. See environment type options in the class EnvironmentType");
             CloudExecutionEnvironment.startup(APP_ID, EnvironmentType.DEV);
         }
         else
         {
-            logger.info("Starting with environment type: " + type);
+            LOGGER.info("Starting with environment type: " + type);
             CloudExecutionEnvironment.startup(APP_ID, type);
         }
         
@@ -130,7 +116,7 @@ public class App
         boolean startup_allowed = AppAdminUtil.indicesProperlyConfigured();
         if (! startup_allowed)
         {
-            logger.fatal("Exiting now...");
+            LOGGER.fatal("Exiting now...");
             System.exit(1);
         }
         
@@ -157,6 +143,10 @@ public class App
         String html_src = System.getProperty("jimmutable.html.src");
         if ("webapp".equalsIgnoreCase(html_src))
         {
+            context.setResourceBase("src/main/webapp");
+        }
+        else // Inside jar
+        {
             context.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
             
             URL webapp_location = App.class.getResource("/src/main/webapp/");
@@ -172,27 +162,23 @@ public class App
             }
             catch (URISyntaxException e)
             {
-                logger.error(e);
+                LOGGER.error(e);
             }
-            logger.info(String.format("Webapp URI: %s", webapp_uri));
+            LOGGER.info(String.format("Webapp URI: %s", webapp_uri));
             
             context.setBaseResource(Resource.newResource(webapp_uri));
-        }
-        else
-        {
-            context.setResourceBase("src/main/webapp");
         }
         
         context.setContextPath("/");
         
         // Add servlets to context
-        logger.trace(String.format("ACTION_MAPPINGS: %s", ACTION_MAPPINGS));
+        LOGGER.trace(String.format("ACTION_MAPPINGS: %s", ACTION_MAPPINGS));
         ACTION_MAPPINGS.forEach((k, v) ->
         {
             context.addServlet(v, k);
         });
         
-        logger.trace(String.format("VIEW_MAPPINGS: %s", VIEW_MAPPINGS));
+        LOGGER.trace(String.format("VIEW_MAPPINGS: %s", VIEW_MAPPINGS));
         VIEW_MAPPINGS.forEach((k, v) ->
         {
             context.addServlet(ViewController.class, v.getPathSpec());
@@ -205,6 +191,10 @@ public class App
         
         // Add filters to context
         // TODO Implement authentication
+        // TODO Do we want to define auth config in an .ini file?
+        context.setInitParameter("shiroConfigLocations", "/shiro.ini");
+        context.addEventListener(new EnvironmentLoaderListener());
+        context.addFilter(ShiroFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
 //        context.addFilter(AuthenticationFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
         
         org.eclipse.jetty.webapp.Configuration.ClassList classlist = org.eclipse.jetty.webapp.Configuration.ClassList.setServerDefault(server);
