@@ -63,17 +63,26 @@ public class UserRealm extends AuthorizingRealm
         UsernamePasswordToken user_token = (UsernamePasswordToken) token;
         
         String username = Normalizer.lowerCase(user_token.getUsername());
+        LOGGER.trace(String.format("Authenticating %s",  username));
         
         String query = String.format("%s:\"%s\"", User.SEARCH_FIELD_USERNAME.getSimpleFieldName().getSimpleName(), username);
         StandardSearchRequest search_request = new StandardSearchRequest(query);
         
         List<OneSearchResultWithTyping> results = CloudExecutionEnvironment.getSimpleCurrent().getSimpleSearch().search(User.INDEX_DEFINITION, search_request, Collections.emptyList());
-        if (results.isEmpty()) return null;
+        if (results.isEmpty())
+        {
+            LOGGER.trace(String.format("Authenticating %s - Username not found in Search", username));
+            return null;
+        }
         
         ObjectId id = new ObjectId(results.get(0).readAsAtom(User.SEARCH_FIELD_ID.getSimpleFieldName(), null));
         
         User user = StorageUtil.getComplexCurrentVersion(User.KIND, id, null);
-        if (null == user) return null;
+        if (null == user)
+        {
+            LOGGER.trace(String.format("Authenticating %s - ID: %s - User not found in Storage", username, id));
+            return null;
+        }
         
         ByteSource salt = new SimpleByteSource(Base64.decode(user.getSimplePasswordSalt()));
         return new SimpleAuthenticationInfo(token.getPrincipal(), user.getSimplePasswordHash(), salt, REALM_NAME);

@@ -19,6 +19,7 @@ import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.jimmutable.cloud.ApplicationId;
@@ -27,6 +28,7 @@ import org.jimmutable.cloud.DefaultJetty2Log4j2Bridge;
 import org.jimmutable.cloud.EnvironmentType;
 import org.jimmutable.cloud.utils.AppAdminUtil;
 
+import net.jdkr.readingrover.auth.AuthenticationFilter;
 import net.jdkr.readingrover.auth.DoLogin;
 import net.jdkr.readingrover.user.DoUserSignup;
 import net.jdkr.readingrover.util.Log4jOneUtil;
@@ -39,7 +41,7 @@ public class App
     
     static public final ApplicationId APP_ID = new ApplicationId("reading-rover");
     
-    static private final int MAX_FORM_SIZE = 1024 * 1024 * 1024; // ~1074 MB
+    static private final int MAX_FORM_SIZE = 32 * 1024 * 1024; // 32 MB
     
     static public final Map<String, ServletSpecForwardUri> VIEW_MAPPINGS;
     static public final Map<String, Class<? extends HttpServlet>> ACTION_MAPPINGS;
@@ -50,7 +52,6 @@ public class App
         VIEW_MAPPINGS.put("/", new ServletSpecForwardUri("", "/index/index.jsp"));
         VIEW_MAPPINGS.put("/public/login.html", new ServletSpecForwardUri("/public/login.html", "/public/login.jsp"));
         VIEW_MAPPINGS.put("/index/index.html", new ServletSpecForwardUri("/index/index.html", "/index/index.jsp"));
-        VIEW_MAPPINGS.put("/login.html", new ServletSpecForwardUri("/login.html", "/login.jsp"));
     }
     
     static
@@ -58,8 +59,6 @@ public class App
         ACTION_MAPPINGS = new HashMap<>();
         
         ACTION_MAPPINGS.put("/public/do-login", DoLogin.class);
-//        ACTION_MAPPINGS.put("/index/index/do-redirect", DoIndexRedirect.class);
-        
         ACTION_MAPPINGS.put("/public/users/do-signup", DoUserSignup.class);
 //        ACTION_MAPPINGS.put("/public/users/check-username", DoCheckUsername.class);
     }
@@ -192,10 +191,9 @@ public class App
             context.addServlet(ViewController.class, v.getPathSpec());
         });
         
-        // TODO Create /common/404.html
-//        ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();
-//        errorHandler.addErrorPage(404, "/common/404.html");
-//        context.setErrorHandler(errorHandler);
+        ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();
+        errorHandler.addErrorPage(404, "/public/404.html");
+        context.setErrorHandler(errorHandler);
         
         // Add filters to context
         // TODO Implement authentication
@@ -203,7 +201,7 @@ public class App
         context.setInitParameter("shiroConfigLocations", "/shiro.ini");
         context.addEventListener(new EnvironmentLoaderListener());
         context.addFilter(ShiroFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
-//        context.addFilter(AuthenticationFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+        context.addFilter(AuthenticationFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST)); // Must go _after_ Shiro
         
         org.eclipse.jetty.webapp.Configuration.ClassList classlist = org.eclipse.jetty.webapp.Configuration.ClassList.setServerDefault(server);
         

@@ -12,7 +12,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
-import org.jimmutable.cloud.servlet_utils.common_objects.GeneralResponseError;
 import org.jimmutable.cloud.servlets.util.RequestPageData;
 import org.jimmutable.cloud.servlets.util.ServletUtil;
 import org.jimmutable.core.objects.common.ObjectId;
@@ -23,12 +22,6 @@ import org.jimmutable.core.serialization.reader.HandReader;
 public class DoLogin extends HttpServlet
 {
     private static final Logger LOGGER = LogManager.getLogger(DoLogin.class);
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException
-    {
-        login(request, response);
-    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException
@@ -42,22 +35,19 @@ public class DoLogin extends HttpServlet
 
         if (page_data.isEmpty())
         {
-            LOGGER.error("Request contains no data");
-            LoginResponseFailure failure = new LoginResponseFailure("Must provide both username and password");
-            ServletUtil.writeSerializedResponse(response, failure, HttpServletResponse.SC_BAD_REQUEST);
+            sendError(response, "Must provide both username and password");
             return;
         }
 
         HandReader reader = new HandReader(page_data.getOptionalDefaultJSONData(""));
         
-        String username = reader.readString("params/username", null);
-        String password = reader.readString("params/password", null);
-        boolean remember_me = reader.readBoolean("params/remember_me", true);
+        String username = reader.readString("data/username", null);
+        String password = reader.readString("data/password", null);
+        boolean remember_me = reader.readBoolean("data/remember_me", true);
         
         if (null == username || null == password)
         {
-            LoginResponseFailure failure = new LoginResponseFailure("Must provide both username and password");
-            ServletUtil.writeSerializedResponse(response, failure, HttpServletResponse.SC_BAD_REQUEST);
+            sendError(response, "Must provide both username and password");
             return;
         }
         
@@ -70,10 +60,7 @@ public class DoLogin extends HttpServlet
         {
             current_user.login(token);
             
-            // TODO Does shiro remember the user? Remember the session?
-            // TODO Do we need to forward the user?
             LoginResponseOK ok = new LoginResponseOK(ObjectId.createRandomId()); // TODO This isn't right... Lean into Shiro
-
             ServletUtil.writeSerializedResponse(response, ok, HttpServletResponse.SC_OK);
             return;
         }
@@ -83,8 +70,12 @@ public class DoLogin extends HttpServlet
             LOGGER.trace(e.getMessage());
         }
         
-        LoginResponseFailure failure = new LoginResponseFailure("Invalid login");
+        sendError(response, "Incorrect username or password");
+    }
+    
+    static private void sendError(HttpServletResponse response, String message)
+    {
+        LoginResponseFailure failure = new LoginResponseFailure(message);
         ServletUtil.writeSerializedResponse(response, failure, HttpServletResponse.SC_FORBIDDEN);
-        return;
     }
 }
