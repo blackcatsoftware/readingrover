@@ -15,12 +15,15 @@
 
     <!-- Custom styles for this template -->
     <link href="signin.css" rel="stylesheet">
+
+    <script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   </head>
 
   <body>
     <%@ include file="rr-svg.html" %>
 
-    <form action="/public/do-login" method="post" class="form-signin">
+    <form id="app" class="form-signin">
       <div class="text-center mb-4">
         
         <svg class="Logo" fill="var(--logo-background)">
@@ -33,22 +36,72 @@
       </div>
 
       <div class="form-label-group">
-        <input type="text" id="username" name="username" class="form-control" placeholder="Username" required autofocus>
+        <input type="text" id="username" name="username" class="form-control" placeholder="Username" v-model.trim="auth.username" required autofocus>
         <label for="username">Username</label>
       </div>
 
       <div class="form-label-group">
-        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+        <input type="password" id="password" name="password" class="form-control" placeholder="Password" v-model.trim="auth.password" required>
         <label for="password">Password</label>
       </div>
 
       <div class="custom-control custom-checkbox mb-3">
-        <input type="checkbox" class="custom-control-input" id="remember" name="remember" value="remember-me" checked>
+        <input type="checkbox" class="custom-control-input" id="remember" name="remember" v-model="auth.remember_me" checked>
         <label class="custom-control-label" for="remember">Remember me</label>
       </div>
       
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+      <button class="btn btn-lg btn-primary btn-block" v-on:click="login">Sign in</button>
       <p class="mt-5 mb-3 text-muted text-center">&copy; 2018</p>
     </form>
+
+    <script>
+      const app = new Vue(
+      {
+        el: '#app',
+        data:
+        {
+          auth:
+          {
+            username: '',
+            password: '',
+            remember_me: true
+          }
+        },
+        methods:
+        {
+          login: function(event)
+          {
+            if (! event.target.form.checkValidity())
+            {
+              return;
+            }
+
+            event.preventDefault();
+
+            console.log("Username: " + this.auth.username);
+            console.log("Password: " + this.auth.password);
+            console.log("Remember Me?: " + (this.auth.remember_me ? "Yes" : "No"));
+
+            axios.post('/public/do-login',
+            {
+              params:
+              {
+                username: this.auth.username,
+                password: this.auth.password,
+                remember_me: this.auth.remember_me
+              }
+            })
+            .then( response =>
+            {
+              alert("Logged In!");
+            })
+            .catch(error =>
+            {
+              alert("Unable to log in :(");
+            });
+          }
+        }
+      })
+    </script>
   </body>
 </html>

@@ -12,8 +12,11 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.jimmutable.cloud.servlet_utils.common_objects.GeneralResponseError;
+import org.jimmutable.cloud.servlets.util.RequestPageData;
 import org.jimmutable.cloud.servlets.util.ServletUtil;
 import org.jimmutable.core.objects.common.ObjectId;
+import org.jimmutable.core.serialization.reader.HandReader;
 
 
 @SuppressWarnings("serial")
@@ -35,10 +38,21 @@ public class DoLogin extends HttpServlet
     
     private void login(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
-        LOGGER.info("Starting login!");
+        RequestPageData page_data = ServletUtil.getPageDataFromPost(request, new RequestPageData());
+
+        if (page_data.isEmpty())
+        {
+            LOGGER.error("Request contains no data");
+            LoginResponseFailure failure = new LoginResponseFailure("Must provide both username and password");
+            ServletUtil.writeSerializedResponse(response, failure, HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        HandReader reader = new HandReader(page_data.getOptionalDefaultJSONData(""));
         
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        String username = reader.readString("params/username", null);
+        String password = reader.readString("params/password", null);
+        boolean remember_me = reader.readBoolean("params/remember_me", true);
         
         if (null == username || null == password)
         {
@@ -48,7 +62,7 @@ public class DoLogin extends HttpServlet
         }
         
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
-//        token.setRememberMe(true); // TOOD Figure out "remember me" (mostly update front end form)
+        token.setRememberMe(remember_me);
         
         Subject current_user = SecurityUtils.getSubject();
         
