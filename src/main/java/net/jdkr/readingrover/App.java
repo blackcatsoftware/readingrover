@@ -50,6 +50,7 @@ public class App
         VIEW_MAPPINGS.put("/", new ServletSpecForwardUri("", "/index/index.jsp"));
         VIEW_MAPPINGS.put("/public/login.html", new ServletSpecForwardUri("/public/login.html", "/public/login.jsp"));
         VIEW_MAPPINGS.put("/index/index.html", new ServletSpecForwardUri("/index/index.html", "/index/index.jsp"));
+        VIEW_MAPPINGS.put("/login.html", new ServletSpecForwardUri("/login.html", "/login.jsp"));
     }
     
     static
