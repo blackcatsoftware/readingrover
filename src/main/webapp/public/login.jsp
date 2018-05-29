@@ -25,8 +25,8 @@
     <form id="app" class="form-signin">
       <div class="text-center mb-4">
         
-        <svg class="Logo" fill="var(--logo-background)">
-            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#SVGReadingRoverLogoBackground">
+        <svg class="Logo">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#SVGReadingRoverLogo">
             </use>            
         </svg>
           
