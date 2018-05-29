@@ -85,6 +85,7 @@ body {
   --logo-background: #6FCAC7;
   --logo-right-outline: #088C44;
   --logo-left-outline: #036D8B;
+  --logo-emphasis: #C51F30;
   --logo-foreground: #FFF;
   width: 256 px;
 }
