@@ -11,6 +11,7 @@ import java.util.Objects;
 import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServlet;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
@@ -26,6 +27,7 @@ import org.jimmutable.cloud.ApplicationId;
 import org.jimmutable.cloud.CloudExecutionEnvironment;
 import org.jimmutable.cloud.DefaultJetty2Log4j2Bridge;
 import org.jimmutable.cloud.EnvironmentType;
+import org.jimmutable.cloud.logging.Log4jUtil;
 import org.jimmutable.cloud.utils.AppAdminUtil;
 
 import net.jdkr.readingrover.auth.AuthenticationFilter;
@@ -124,10 +126,11 @@ public class App
             System.exit(1);
         }
         
+        // Configure log4j 1.x
         Log4jOneUtil.setupListeners();
+        Log4jOneUtil.setAllLoggerLevels(Log4jUtil.getCurrentLogLevel());
 
         DevStartupData.upsertAllStartupData();
-
         
         // Creating the server on port 8080
         Server server = new Server(8080);
@@ -196,7 +199,6 @@ public class App
         context.setErrorHandler(errorHandler);
         
         // Add filters to context
-        // TODO Implement authentication
         // TODO Do we want to define auth config in an .ini file?
         context.setInitParameter("shiroConfigLocations", "/shiro.ini");
         context.addEventListener(new EnvironmentLoaderListener());
