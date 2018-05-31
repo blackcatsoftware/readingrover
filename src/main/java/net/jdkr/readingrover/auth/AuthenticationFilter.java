@@ -18,7 +18,9 @@ import org.apache.shiro.subject.Subject;
 
 public class AuthenticationFilter implements Filter
 {
-    private static final Logger LOGGER = LogManager.getLogger(AuthenticationFilter.class);
+    static private final Logger LOGGER = LogManager.getLogger(AuthenticationFilter.class);
+    
+    static public final String LOGIN_URL = "/public/login";
     
     @Override
     public void init(FilterConfig filterConfig) throws ServletException
@@ -87,7 +89,7 @@ public class AuthenticationFilter implements Filter
         
         StringBuilder login_url = new StringBuilder()
                                   .append(request.getContextPath())
-                                  .append("/public/login.html?fwd=")
+                                  .append(LOGIN_URL + "?fwd=")
                                   .append(request_url.toString());
         
         response.sendRedirect(login_url.toString());

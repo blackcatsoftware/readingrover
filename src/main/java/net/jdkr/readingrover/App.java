@@ -11,7 +11,6 @@ import java.util.Objects;
 import javax.servlet.DispatcherType;
 import javax.servlet.http.HttpServlet;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
@@ -52,8 +51,10 @@ public class App
     {
         VIEW_MAPPINGS = new HashMap<>();
         VIEW_MAPPINGS.put("/", new ServletSpecForwardUri("", "/index/index.jsp"));
-        VIEW_MAPPINGS.put("/public/login.html", new ServletSpecForwardUri("/public/login.html", "/public/login.jsp"));
         VIEW_MAPPINGS.put("/index/index.html", new ServletSpecForwardUri("/index/index.html", "/index/index.jsp"));
+        
+        VIEW_MAPPINGS.put("/public/login", new ServletSpecForwardUri("/public/login", "/public/login.jsp"));
+        VIEW_MAPPINGS.put("/public/signup", new ServletSpecForwardUri("/public/signup", "/public/signup.jsp"));
     }
     
     static
