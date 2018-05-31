@@ -85,6 +85,13 @@ public class User extends StandardImmutableObject<User> implements Storable, Ind
         builder.add(SearchIndexDefinition.FIELD_FIELDS, SEARCH_FIELD_USERNAME);
         builder.add(SearchIndexDefinition.FIELD_FIELDS, SEARCH_FIELD_EMAIL_ADDRESS);
         
+        builder.add(SearchIndexDefinition.FIELD_FIELDS, SEARCH_FIELD_FIRST_NAME);
+        builder.add(SearchIndexDefinition.FIELD_FIELDS, SEARCH_FIELD_LAST_INITIAL);
+        
+        builder.add(SearchIndexDefinition.FIELD_FIELDS, SEARCH_FIELD_BIRTHDAY);
+        
+        builder.add(SearchIndexDefinition.FIELD_FIELDS, SEARCH_FIELD_AVATAR_ID);
+        
         builder.set(SearchIndexDefinition.FIELD_INDEX_DEFINITION, INDEX_DEFINITION);
         
         INDEX_MAPPING = builder.create(null);

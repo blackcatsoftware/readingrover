@@ -54,7 +54,7 @@
       <div class="mt-5 mb-3 text-muted text-center">
         <a class="text-primary" href="/public/signup">Create an Account</a>
       </div>
-      
+
       <p class="mt-5 mb-3 text-muted text-center">&copy; 2018</p>
     </form>
 
@@ -81,10 +81,6 @@
             }
 
             event.preventDefault();
-
-            console.log("Username: " + this.auth.username);
-            console.log("Password: " + this.auth.password);
-            console.log("Remember Me?: " + (this.auth.remember_me ? "Yes" : "No"));
 
             axios.post('/public/do-login',
             {
