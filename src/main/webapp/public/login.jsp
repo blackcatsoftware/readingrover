@@ -50,6 +50,11 @@
       </div>
       
       <button class="btn btn-lg btn-primary btn-block" v-on:click="login">Sign in</button>
+
+      <div class="mt-5 mb-3 text-muted text-center">
+        <a class="text-primary" href="/public/signup">Create an Account</a>
+      </div>
+      
       <p class="mt-5 mb-3 text-muted text-center">&copy; 2018</p>
     </form>
 
