@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 
 import org.jimmutable.core.objects.Builder;
 import org.jimmutable.core.objects.StandardObject;
+import org.jimmutable.core.objects.common.Day;
 import org.jimmutable.core.objects.common.ObjectId;
 import org.jimmutable.core.serialization.Format;
 import org.junit.Test;
@@ -21,6 +22,13 @@ public class UserTest extends StubTest
     static private final String USERNAME = "username";
     static private final String EMAIL_ADDRESS= "email@address.com";
     
+    static private final String FIRST_NAME = "First";
+    static private final String LAST_INITIAL= "L";
+    
+    static private final Day BIRTHDAY = new Day("01/02/2003");
+    
+    static private final ObjectId AVATAR_ID = new ObjectId(987);
+    
     static private final String PASSWORD_HASH = "password#hash";
     static private final String PASSWORD_SALT = "password:salt";
     
@@ -33,6 +41,13 @@ public class UserTest extends StubTest
         
         builder.set(User.FIELD_USERNAME, USERNAME);
         builder.set(User.FIELD_EMAIL_ADDRESS, EMAIL_ADDRESS);
+
+        builder.set(User.FIELD_FIRST_NAME, FIRST_NAME);
+        builder.set(User.FIELD_LAST_INITIAL, LAST_INITIAL);
+
+        builder.set(User.FIELD_BIRTHDAY, BIRTHDAY);
+        
+        builder.set(User.FIELD_AVATAR_ID, AVATAR_ID);
 
         builder.set(User.FIELD_PASSWORD_HASH, PASSWORD_HASH);
         builder.set(User.FIELD_PASSWORD_SALT, PASSWORD_SALT);
@@ -56,12 +71,8 @@ public class UserTest extends StubTest
             // expect this, required fields not set
         }
         
-        builder = new Builder(User.TYPE_NAME);
-        
-        builder.set(User.FIELD_ID, ID);
-        builder.set(User.FIELD_USERNAME, USERNAME);
-        builder.set(User.FIELD_PASSWORD_HASH, PASSWORD_HASH);
-        builder.set(User.FIELD_PASSWORD_SALT, PASSWORD_SALT);
+        builder = createAndPopulateUserBuilder();
+        builder.unset(User.FIELD_EMAIL_ADDRESS);
         
         User required_only = builder.create(null);
         
@@ -79,6 +90,10 @@ public class UserTest extends StubTest
         assertEquals(getter_test.getSimpleObjectId(), ID);
         assertEquals(getter_test.getSimpleUsername(), USERNAME);
         assertEquals(getter_test.getOptionalEmailAddress(null), EMAIL_ADDRESS);
+        assertEquals(getter_test.getSimpleFirstName(), FIRST_NAME);
+        assertEquals(getter_test.getSimpleLastInitial(), LAST_INITIAL);
+        assertEquals(getter_test.getSimpleBirthday(), BIRTHDAY);
+        assertEquals(getter_test.getSimpleAvatarId(), AVATAR_ID);
         assertEquals(getter_test.getSimplePasswordHash(), PASSWORD_HASH);
         assertEquals(getter_test.getSimplePasswordSalt(), PASSWORD_SALT);
         
@@ -88,17 +103,20 @@ public class UserTest extends StubTest
     @Test
     public void testSerialization()
     {
-        String obj_string = String.format("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s"
+        String obj_string = String.format("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s"
                         , "{"
                         , "  \"type_hint\" : \"user\","
                         , "  \"id\" : \"0000-0000-0000-007b\","
                         , "  \"username\" : \"username\","
                         , "  \"email_address\" : \"email@address.com\","
+                        , "  \"first_name\" : \"First\","
+                        , "  \"last_name\" : \"L\","
+                        , "  \"birthday\" : \"01/02/2003\","
+                        , "  \"avatar_id\" : \"0000-0000-0000-03db\","
                         , "  \"password_hash\" : \"password#hash\","
                         , "  \"password_salt\" : \"password:salt\""
                         , "}"
                    );
-
         User user = (User) StandardObject.deserialize(obj_string);
         
         assertEquals(user.getSimpleObjectId(), ID);
@@ -141,6 +159,38 @@ public class UserTest extends StubTest
     {
         Builder builder = createAndPopulateUserBuilder();
         builder.unset(User.FIELD_USERNAME);
+        builder.create(null);
+    }
+    
+    @Test(expected = Exception.class)
+    public void testRequiredFieldFirstName()
+    {
+        Builder builder = createAndPopulateUserBuilder();
+        builder.unset(User.FIELD_FIRST_NAME);
+        builder.create(null);
+    }
+    
+    @Test(expected = Exception.class)
+    public void testRequiredFieldLastName()
+    {
+        Builder builder = createAndPopulateUserBuilder();
+        builder.unset(User.FIELD_LAST_INITIAL);
+        builder.create(null);
+    }
+    
+    @Test(expected = Exception.class)
+    public void testRequiredFieldBirthday()
+    {
+        Builder builder = createAndPopulateUserBuilder();
+        builder.unset(User.FIELD_BIRTHDAY);
+        builder.create(null);
+    }
+    
+    @Test(expected = Exception.class)
+    public void testRequiredFieldAvatarId()
+    {
+        Builder builder = createAndPopulateUserBuilder();
+        builder.unset(User.FIELD_AVATAR_ID);
         builder.create(null);
     }
     
