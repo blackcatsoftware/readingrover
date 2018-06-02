@@ -84,7 +84,7 @@
       </div>
       <div class="form-group">
           <label for="confirm_password">Confirm Password</label>
-          <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Password" v-model.trim="user.confirm_password" required>
+          <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Password" v-model.trim="user.confirm_password" ref="confirm_password_el" required>
       </div>
       <!-- TODO Manage avatar via Vue -->
       <div class="form-group">
@@ -122,15 +122,33 @@
                     avatar_id: ''
                 }
             },
+            computed:
+            {
+                passwords_match()
+                {
+                    // Don't nag the user until they've started entering the confirm password
+                    if (! this.user.password) return true;
+                    if (! this.user.confirm_password) return true;
+
+                    return this.user.password == this.user.confirm_password;
+                }
+            },
             watch:
             {
-                raw_bday_value(newVal, oldVal)
+                raw_bday_value(new_val, old_val)
                 {
-                    this.user.birthday = this.convertHtmlToDay(newVal);
+                    this.user.birthday = this.convertHtmlToDay(new_val);
                 },
-                password(newVal, oldVal)
+                passwords_match(new_val, old_val)
                 {
-
+                    if (new_val)
+                    {
+                        app.$refs.confirm_password_el.setCustomValidity("");
+                    }
+                    else
+                    {
+                        app.$refs.confirm_password_el.setCustomValidity("Passwords Must Match");
+                    }
                 },
             },
             methods:
@@ -155,7 +173,6 @@
                             last_initial: this.user.last_initial,
                             birthday: this.birthday,
                             password: this.user.password,
-                            confirm_password: this.user.confirm_password,
                             avatar_id: this.user.avatar_id
                         }
                     })
