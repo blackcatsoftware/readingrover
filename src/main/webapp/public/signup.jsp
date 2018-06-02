@@ -166,20 +166,17 @@
 
                     axios.post('/public/users/do-signup',
                     {
-                        data:
-                        {
-                            username: this.user.username,
-                            first_name: this.user.first_name,
-                            last_initial: this.user.last_initial,
-                            birthday: this.birthday,
-                            password: this.user.password,
-                            avatar_id: this.user.avatar_id
-                        }
+                        username: this.user.username,
+                        first_name: this.user.first_name,
+                        last_initial: this.user.last_initial,
+                        birthday: this.user.birthday,
+                        password: this.user.password,
+                        avatar_id: this.user.avatar_id
                     })
                     .then(response =>
                     {
-                        // window.location.assign("/home");
-                        alert("User created!");
+                        console.log("User creation successful");
+                        window.location.assign("/home");
                     })
                     .catch(error =>
                     {

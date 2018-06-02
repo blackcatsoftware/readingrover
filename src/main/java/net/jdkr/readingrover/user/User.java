@@ -45,7 +45,7 @@ public class User extends StandardImmutableObject<User> implements Storable, Ind
     static public final FieldDefinition.String FIELD_EMAIL_ADDRESS = new FieldDefinition.String("email_address",null);
     
     static public final FieldDefinition.String FIELD_FIRST_NAME = new FieldDefinition.String("first_name",null);
-    static public final FieldDefinition.String FIELD_LAST_INITIAL = new FieldDefinition.String("last_name",null);
+    static public final FieldDefinition.String FIELD_LAST_INITIAL = new FieldDefinition.String("last_initial",null);
     
     static public final FieldDefinition.Stringable<Day> FIELD_BIRTHDAY = new FieldDefinition.Stringable<>("birthday", null, Day.CONVERTER);
     

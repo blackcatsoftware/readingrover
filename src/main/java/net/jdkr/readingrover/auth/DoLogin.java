@@ -14,7 +14,6 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.jimmutable.cloud.servlets.util.RequestPageData;
 import org.jimmutable.cloud.servlets.util.ServletUtil;
-import org.jimmutable.core.objects.common.ObjectId;
 import org.jimmutable.core.serialization.reader.HandReader;
 
 
@@ -41,9 +40,9 @@ public class DoLogin extends HttpServlet
 
         HandReader reader = new HandReader(page_data.getOptionalDefaultJSONData(""));
         
-        String username = reader.readString("data/username", null);
-        String password = reader.readString("data/password", null);
-        boolean remember_me = reader.readBoolean("data/remember_me", true);
+        String username = reader.readString("username", null);
+        String password = reader.readString("password", null);
+        boolean remember_me = reader.readBoolean("remember_me", true);
         
         if (null == username || null == password)
         {
@@ -60,7 +59,7 @@ public class DoLogin extends HttpServlet
         {
             current_user.login(token);
             
-            LoginResponseOK ok = new LoginResponseOK(ObjectId.createRandomId()); // TODO This isn't right... Lean into Shiro
+            LoginResponseOK ok = new LoginResponseOK();
             ServletUtil.writeSerializedResponse(response, ok, HttpServletResponse.SC_OK);
             return;
         }

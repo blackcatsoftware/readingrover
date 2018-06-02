@@ -84,16 +84,13 @@
 
             axios.post('/public/do-login',
             {
-              data:
-              {
-                username: this.auth.username,
-                password: this.auth.password,
-                remember_me: this.auth.remember_me
-              }
+              username: this.auth.username,
+              password: this.auth.password,
+              remember_me: this.auth.remember_me
             })
             .then(response =>
             {
-              window.location.assign(this.getOptionalRequestURL("fwd", "/"));
+              window.location.assign(this.getOptionalRequestURL("fwd", "/home"));
             })
             .catch(error =>
             {

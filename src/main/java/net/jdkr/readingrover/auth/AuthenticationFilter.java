@@ -18,7 +18,20 @@ import org.apache.shiro.subject.Subject;
 
 public class AuthenticationFilter implements Filter
 {
-    static private final Logger LOGGER = LogManager.getLogger(AuthenticationFilter.class);
+    static private Logger logger = null; 
+    
+    synchronized static private Logger getLogger()
+    {
+        if (null == logger)
+        {
+            synchronized (AuthenticationFilter.class)
+            {
+                logger = LogManager.getLogger(AuthenticationFilter.class);
+            }
+        }
+        
+        return logger;
+    }
     
     static public final String LOGIN_URL = "/public/login";
     
@@ -26,7 +39,7 @@ public class AuthenticationFilter implements Filter
     public void init(FilterConfig filterConfig) throws ServletException
     {
         // Nothing to do
-        LOGGER.trace("init<>");
+        getLogger().trace("init<>");
     }
     
     @Override
@@ -36,7 +49,7 @@ public class AuthenticationFilter implements Filter
         {
             if (! ((req instanceof HttpServletRequest) && (resp instanceof HttpServletResponse)))
             {
-                LOGGER.fatal(String.format("Not an http servlet!"));
+                getLogger().fatal(String.format("Not an http servlet!"));
                 return;
             }
             
@@ -44,11 +57,11 @@ public class AuthenticationFilter implements Filter
             HttpServletResponse response = (HttpServletResponse) resp;
 
             Subject user = SecurityUtils.getSubject();
-            LOGGER.trace(String.format("URI: %s - Current User: %s - Remembered?: %s - Authenticated?: %s", request.getRequestURI(), user.getPrincipal(), user.isRemembered() ? "Yes" : "No", user.isAuthenticated() ? "Yes" : "Not"));
+            getLogger().trace(String.format("URI: %s - Current User: %s - Remembered?: %s - Authenticated?: %s", request.getRequestURI(), user.getPrincipal(), user.isRemembered() ? "Yes" : "No", user.isAuthenticated() ? "Yes" : "Not"));
             
             if (request.getRequestURI().startsWith("/public/"))
             {
-                LOGGER.trace(String.format("URI: %s - Allowed / Public", request.getRequestURI()));
+                getLogger().trace(String.format("URI: %s - Allowed / Public", request.getRequestURI()));
                 chain.doFilter(request, response);
                 return;
             }
@@ -56,7 +69,7 @@ public class AuthenticationFilter implements Filter
             // Don't allow users to know that we use jsp files
             if (null == request.getAttribute("javax.servlet.forward.request_uri") && request.getRequestURI().endsWith(".jsp"))
             {
-                LOGGER.warn(String.format("URI: %s - Current User: %s - Not Allowed / JSP", request.getRequestURI(), user.getPrincipal()));
+                getLogger().warn(String.format("URI: %s - Current User: %s - Not Allowed / JSP", request.getRequestURI(), user.getPrincipal()));
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
@@ -75,7 +88,7 @@ public class AuthenticationFilter implements Filter
         }
         catch (Exception e)
         {
-            LOGGER.error(e);
+            logger.error(e);
         }
     }
     
@@ -99,6 +112,6 @@ public class AuthenticationFilter implements Filter
     public void destroy()
     {
         // Nothing to do
-        LOGGER.trace("destroy<>");
+        logger.trace("destroy<>");
     }
 }

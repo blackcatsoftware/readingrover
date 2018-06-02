@@ -1,0 +1,144 @@
+package net.jdkr.readingrover.user;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.crypto.RandomNumberGenerator;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
+import org.apache.shiro.crypto.hash.Sha512Hash;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ByteSource;
+import org.jimmutable.cloud.CloudExecutionEnvironment;
+import org.jimmutable.cloud.servlet_utils.common_objects.GeneralResponseError;
+import org.jimmutable.cloud.servlet_utils.upsert.UpsertResponseOK;
+import org.jimmutable.cloud.servlets.util.RequestPageData;
+import org.jimmutable.cloud.servlets.util.ServletUtil;
+import org.jimmutable.core.objects.Builder;
+import org.jimmutable.core.objects.common.Day;
+import org.jimmutable.core.objects.common.ObjectId;
+import org.jimmutable.core.serialization.Format;
+import org.jimmutable.core.serialization.reader.HandReader;
+import org.jimmutable.core.utils.Validator;
+
+// TODO Make this DoUpsertUser - Requires authenticating the current user and authorizing them to make changes for the affected user
+
+@SuppressWarnings("serial")
+public class DoUserSignup extends HttpServlet
+{
+    private static final Logger LOGGER = LogManager.getLogger(DoUserSignup.class);
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    {
+        RequestPageData page_data = ServletUtil.getPageDataFromPost(request, new RequestPageData());
+
+        if (page_data.isEmpty())
+        {
+            LOGGER.error("Request contains no data");
+            ServletUtil.writeSerializedResponse(response, new GeneralResponseError("Request failed"), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
+        }
+
+        HandReader reader = new HandReader(page_data.getOptionalDefaultJSONData(""));
+
+        try
+        {
+            Builder builder = new Builder(User.TYPE_NAME);
+            builder.set(User.FIELD_ID, ObjectId.createRandomId());
+            
+            builder.set(User.FIELD_USERNAME, reader.readString(User.FIELD_USERNAME.getSimpleFieldName().getSimpleName(), null));
+            builder.set(User.FIELD_EMAIL_ADDRESS, reader.readString(User.FIELD_EMAIL_ADDRESS.getSimpleFieldName().getSimpleName(), null));
+            
+            builder.set(User.FIELD_FIRST_NAME, reader.readString(User.FIELD_FIRST_NAME.getSimpleFieldName().getSimpleName(), null));
+            builder.set(User.FIELD_LAST_INITIAL, reader.readString(User.FIELD_LAST_INITIAL.getSimpleFieldName().getSimpleName(), null));
+            
+            String birthday_raw = reader.readString(User.FIELD_BIRTHDAY.getSimpleFieldName().getSimpleName(), null);
+            Validator.notNull(birthday_raw, "Birthday");
+            
+            builder.set(User.FIELD_BIRTHDAY, new Day(birthday_raw));
+            
+            // TODO Send real avatar ID
+            builder.set(User.FIELD_AVATAR_ID, ObjectId.createRandomId());
+            
+            String password = reader.readString("password", null);
+            // TODO Password utils
+            RandomNumberGenerator rng = new SecureRandomNumberGenerator();
+            ByteSource salt = rng.nextBytes();
+            
+            String hashed_password = new Sha512Hash(password, salt, 1024).toBase64();
+            builder.set(User.FIELD_PASSWORD_HASH, hashed_password);
+            builder.set(User.FIELD_PASSWORD_SALT, salt.toBase64());
+            
+            User new_user = builder.create(null);
+            
+            LOGGER.debug("New User JSON\n" + new_user.serialize(Format.JSON_PRETTY_PRINT));
+            
+            if (! CloudExecutionEnvironment.getSimpleCurrent().getSimpleStorage().upsert(new_user, Format.JSON_PRETTY_PRINT))
+            {
+                String error_message = String.format("Failed to upsert new object to storage! Kind:%s ObjectId:%s", new_user.getSimpleKind(), new_user.getSimpleObjectId());
+                LOGGER.error(error_message);
+                ServletUtil.writeSerializedResponse(response, new GeneralResponseError(error_message), GeneralResponseError.HTTP_STATUS_CODE_ERROR);
+                return;
+            }
+
+            if (! CloudExecutionEnvironment.getSimpleCurrent().getSimpleSearch().upsertDocumentAsync(new_user))
+            {
+                String error_message = String.format("Failed to upsert new object to search! Kind:%s ObjectId:%s", new_user.getSimpleKind(), new_user.getSimpleObjectId());
+                LOGGER.error(error_message);
+                ServletUtil.writeSerializedResponse(response, new GeneralResponseError(error_message), GeneralResponseError.HTTP_STATUS_CODE_ERROR);
+                return;
+            }
+            
+            // TODO Create util method for DoLogin
+            // TODO There is almost certainly a race condition here b/c Search and Storage are inconsistent
+            // Log the user in
+            {
+                UsernamePasswordToken token = new UsernamePasswordToken(new_user.getSimpleUsername(), password);
+                token.setRememberMe(true);
+                
+                Subject auth_user = SecurityUtils.getSubject();
+                try
+                {
+                    auth_user.login(token);
+                }
+                catch (AuthenticationException e)
+                {
+                    // Failed authentication
+                    LOGGER.trace(e.getMessage());
+                }
+            }
+            
+            ServletUtil.writeSerializedResponse(response, new UpsertResponseOK("Success", new_user), UpsertResponseOK.HTTP_STATUS_CODE_OK);
+            return;
+        }
+        catch (Exception e)
+        {
+            LOGGER.error("Failed to create new object!", e);
+            
+            String error_msg = e.getMessage();
+
+            Throwable cause = e.getCause();
+            while (null != cause)
+            {
+                cause = cause.getCause();
+            }
+            
+            if (null != cause)
+            {
+                error_msg = cause.getMessage();
+            }
+            
+            GeneralResponseError error = new GeneralResponseError(error_msg);
+            ServletUtil.writeSerializedResponse(response, error, GeneralResponseError.HTTP_STATUS_CODE_ERROR);
+        }
+    }
+}

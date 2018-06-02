@@ -19,7 +19,7 @@ public class DevStartupData
                     , "  \"username\" : \"jdezso\","
                     , "  \"email_address\" : \"jdezso@gmail.com\","
                     , "  \"first_name\" : \"Jeff\","
-                    , "  \"last_name\" : \"D\","
+                    , "  \"last_initial\" : \"D\","
                     , "  \"birthday\" : \"03/12/1986\","
                     , "  \"avatar_id\" : \"0000-0000-0000-0001\"," // TODO Set with real avatar ID
                     , "  \"password_hash\" : \"L1ABf5HnwZ/C/fmvJM/11kqY0Tk/FoRGaazSrvfs3Ha/1n3mnoKt6Bx+OgELbTEhzshrMaSPWiHwXuuHmjYi/A==\","
@@ -33,7 +33,7 @@ public class DevStartupData
                     , "  \"id\" : \"5a5e-7bea-71b8-22b7\","
                     , "  \"username\" : \"christy1865\","
                     , "  \"first_name\" : \"Kristen\","
-                    , "  \"last_name\" : \"R\","
+                    , "  \"last_initial\" : \"R\","
                     , "  \"birthday\" : \"12/01/1985\","
                     , "  \"avatar_id\" : \"0000-0000-0000-0001\","
                     , "  \"email_address\" : \"k.r.richter@gmail.com\"," // TODO Set with real avatar ID
