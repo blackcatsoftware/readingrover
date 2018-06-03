@@ -1,11 +1,37 @@
 :root {
   --input-padding-x: .75rem;
   --input-padding-y: .75rem;
+  --logo-background: #6FCAC7;
+  --logo-right-outline: #088C44;
+  --logo-left-outline: #036D8B;
+  --logo-emphasis: #C51F30;
+  --logo-foreground: #FFF;
+}
+
+.svglogobackground {
+    fill: var(--logo-background);
+}
+
+#svglogorightoutline {
+    fill: var(--logo-right-outline);
+}
+
+#svglogoleftoutline {
+    fill: var(--logo-left-outline);
+}
+
+#svglogoemphasis {
+    fill: var(--logo-emphasis);
+}
+
+#svglogoforeground {
+    fill: var(--logo-foreground);
 }
 
 html,
 body {
   height: 100%;
+  padding-bottom: 20px;
 }
 
 body {
@@ -81,11 +107,29 @@ body {
   color: #777;
 }
 
+.navbar {
+  margin-bottom: 20px;
+}
+
+/*
+ * Open dropdowns on hover instead of click.
+ */
+@media (min-width: 768px) {
+  .dropdown:hover > .dropdown-menu {
+    display: block;
+  }
+}
+
 .Logo {
-  --logo-background: #6FCAC7;
-  --logo-right-outline: #088C44;
-  --logo-left-outline: #036D8B;
-  --logo-emphasis: #C51F30;
-  --logo-foreground: #FFF;
   width: 256 px;
+}
+
+.dropdown-header {
+    font-size: 100%;
+}
+
+.dropdown-item.active, .dropdown-item:active, .dropdown-item:hover {
+    color: #fff;
+    text-decoration: none;
+    background-color: var(--logo-background);
 }
