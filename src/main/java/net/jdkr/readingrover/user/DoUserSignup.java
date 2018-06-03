@@ -12,9 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.crypto.RandomNumberGenerator;
-import org.apache.shiro.crypto.SecureRandomNumberGenerator;
-import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
 import org.jimmutable.cloud.CloudExecutionEnvironment;
@@ -28,6 +25,8 @@ import org.jimmutable.core.objects.common.ObjectId;
 import org.jimmutable.core.serialization.Format;
 import org.jimmutable.core.serialization.reader.HandReader;
 import org.jimmutable.core.utils.Validator;
+
+import net.jdkr.readingrover.util.AuthUtil;
 
 // TODO Make this DoUpsertUser - Requires authenticating the current user and authorizing them to make changes for the affected user
 
@@ -70,13 +69,15 @@ public class DoUserSignup extends HttpServlet
             builder.set(User.FIELD_AVATAR_ID, ObjectId.createRandomId());
             
             String password = reader.readString("password", null);
-            // TODO Password utils
-            RandomNumberGenerator rng = new SecureRandomNumberGenerator();
-            ByteSource salt = rng.nextBytes();
-            
-            String hashed_password = new Sha512Hash(password, salt, 1024).toBase64();
-            builder.set(User.FIELD_PASSWORD_HASH, hashed_password);
-            builder.set(User.FIELD_PASSWORD_SALT, salt.toBase64());
+            if (null != password)
+            {
+                ByteSource salt = AuthUtil.newSalt();
+                
+                String hashed_password = AuthUtil.hashPasswordAndEncode(password, salt);
+                
+                builder.set(User.FIELD_PASSWORD_HASH, hashed_password);
+                builder.set(User.FIELD_PASSWORD_SALT, AuthUtil.encodeSalt(salt));
+            }
             
             User new_user = builder.create(null);
             
@@ -89,8 +90,9 @@ public class DoUserSignup extends HttpServlet
                 ServletUtil.writeSerializedResponse(response, new GeneralResponseError(error_message), GeneralResponseError.HTTP_STATUS_CODE_ERROR);
                 return;
             }
-
-            if (! CloudExecutionEnvironment.getSimpleCurrent().getSimpleSearch().upsertDocumentAsync(new_user))
+            
+            // Note: We need to use a sync upsert to make sure login works
+            if (! CloudExecutionEnvironment.getSimpleCurrent().getSimpleSearch().upsertDocument(new_user))
             {
                 String error_message = String.format("Failed to upsert new object to search! Kind:%s ObjectId:%s", new_user.getSimpleKind(), new_user.getSimpleObjectId());
                 LOGGER.error(error_message);

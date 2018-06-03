@@ -12,7 +12,8 @@ import org.jimmutable.core.objects.StandardObject;
  */
 public class Log4JOneLevelChangeListener implements SignalListener
 {
-	@Override
+    @Override
+	@SuppressWarnings("rawtypes")
 	public void onMessageReceived( StandardObject message )
 	{
 		if ( message instanceof LogLevelMessageOnChange )

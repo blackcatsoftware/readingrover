@@ -10,16 +10,10 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authc.credential.CredentialsMatcher;
-import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.cache.CacheManager;
-import org.apache.shiro.codec.Base64;
-import org.apache.shiro.crypto.hash.Sha512Hash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.util.ByteSource;
-import org.apache.shiro.util.SimpleByteSource;
 import org.jimmutable.cloud.CloudExecutionEnvironment;
 import org.jimmutable.cloud.servlet_utils.search.OneSearchResultWithTyping;
 import org.jimmutable.cloud.servlet_utils.search.StandardSearchRequest;
@@ -27,6 +21,7 @@ import org.jimmutable.core.objects.common.ObjectId;
 import org.jimmutable.core.utils.Normalizer;
 
 import net.jdkr.readingrover.user.User;
+import net.jdkr.readingrover.util.AuthUtil;
 import net.jdkr.readingrover.util.StorageUtil;
 
 
@@ -37,24 +32,14 @@ public class UserRealm extends AuthorizingRealm
     static private final String REALM_NAME = "rover-users";
 
     
-    static private CredentialsMatcher createCredentialsMatcher()
-    {
-        HashedCredentialsMatcher matcher = new HashedCredentialsMatcher();
-        matcher.setHashAlgorithmName(Sha512Hash.ALGORITHM_NAME);
-        matcher.setHashIterations(1024); // TODO Match to User creation / storage
-        matcher.setStoredCredentialsHexEncoded(false);
-        return matcher;
-    }
-    
-    
     public UserRealm()
     {
-        super(createCredentialsMatcher());
+        super(AuthUtil.createCredentialsMatcher());
     }
     
     public UserRealm(CacheManager cache_manager)
     {
-        super(cache_manager, createCredentialsMatcher());
+        super(cache_manager, AuthUtil.createCredentialsMatcher());
     }
     
     @Override
@@ -84,8 +69,7 @@ public class UserRealm extends AuthorizingRealm
             return null;
         }
         
-        ByteSource salt = new SimpleByteSource(Base64.decode(user.getSimplePasswordSalt()));
-        return new SimpleAuthenticationInfo(token.getPrincipal(), user.getSimplePasswordHash(), salt, REALM_NAME);
+        return new SimpleAuthenticationInfo(token.getPrincipal(), user.getSimplePasswordHash(), AuthUtil.decodeSalt(user.getSimplePasswordSalt()), REALM_NAME); 
     }
     
     @Override
