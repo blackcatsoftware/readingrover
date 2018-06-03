@@ -55,21 +55,30 @@ public class AuthenticationFilter implements Filter
             
             HttpServletRequest request = (HttpServletRequest) req;
             HttpServletResponse response = (HttpServletResponse) resp;
-
-            Subject user = SecurityUtils.getSubject();
-            getLogger().trace(String.format("URI: %s - Current User: %s - Remembered?: %s - Authenticated?: %s", request.getRequestURI(), user.getPrincipal(), user.isRemembered() ? "Yes" : "No", user.isAuthenticated() ? "Yes" : "Not"));
             
-            if (request.getRequestURI().startsWith("/public/"))
+            String request_uri = request.getRequestURI().toLowerCase();
+            
+            Subject user = SecurityUtils.getSubject();
+            getLogger().trace(String.format("URI: %s - Current User: %s - Remembered?: %s - Authenticated?: %s", request_uri, user.getPrincipal(), user.isRemembered() ? "Yes" : "No", user.isAuthenticated() ? "Yes" : "Not"));
+            
+            if ("/".equals(request_uri) || "/index.html".equals(request_uri))
             {
-                getLogger().trace(String.format("URI: %s - Allowed / Public", request.getRequestURI()));
+                getLogger().trace(String.format("URI: %s - Allowed / Public", request_uri));
+                chain.doFilter(request, response);
+                return;
+            }
+            
+            if (request_uri.startsWith("/public/"))
+            {
+                getLogger().trace(String.format("URI: %s - Allowed / Public", request_uri));
                 chain.doFilter(request, response);
                 return;
             }
             
             // Don't allow users to know that we use jsp files
-            if (null == request.getAttribute("javax.servlet.forward.request_uri") && request.getRequestURI().endsWith(".jsp"))
+            if (null == request.getAttribute("javax.servlet.forward.request_uri") && request_uri.endsWith(".jsp"))
             {
-                getLogger().warn(String.format("URI: %s - Current User: %s - Not Allowed / JSP", request.getRequestURI(), user.getPrincipal()));
+                getLogger().warn(String.format("URI: %s - Current User: %s - Not Allowed / JSP", request_uri, user.getPrincipal()));
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }

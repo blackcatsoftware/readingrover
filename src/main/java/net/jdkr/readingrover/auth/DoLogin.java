@@ -25,11 +25,6 @@ public class DoLogin extends HttpServlet
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException
     {
-        login(request, response);
-    }
-    
-    private void login(HttpServletRequest request, HttpServletResponse response) throws IOException
-    {
         RequestPageData page_data = ServletUtil.getPageDataFromPost(request, new RequestPageData());
 
         if (page_data.isEmpty())
@@ -50,26 +45,37 @@ public class DoLogin extends HttpServlet
             return;
         }
         
+        if (login(username, password, remember_me))
+        {
+            response.setStatus(HttpServletResponse.SC_OK);
+        }
+        else
+        {
+            sendError(response, "Incorrect username or password");
+        }
+    }
+    
+    static public boolean login(String username, String password, boolean remember_me)
+    {
+        if (null == username) return false;
+        if (null == password) return false;
+        
         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
         token.setRememberMe(remember_me);
         
-        Subject current_user = SecurityUtils.getSubject();
-        
         try
         {
+            Subject current_user = SecurityUtils.getSubject();
             current_user.login(token);
             
-            LoginResponseOK ok = new LoginResponseOK();
-            ServletUtil.writeSerializedResponse(response, ok, HttpServletResponse.SC_OK);
-            return;
+            return true;
         }
         catch (AuthenticationException e)
         {
-            // Failed authentication
             LOGGER.trace(e.getMessage());
+            
+            return false;
         }
-        
-        sendError(response, "Incorrect username or password");
     }
     
     static private void sendError(HttpServletResponse response, String message)

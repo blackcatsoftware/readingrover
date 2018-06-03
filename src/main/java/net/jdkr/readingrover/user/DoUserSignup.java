@@ -9,10 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
 import org.jimmutable.cloud.CloudExecutionEnvironment;
 import org.jimmutable.cloud.servlet_utils.common_objects.GeneralResponseError;
@@ -26,6 +22,7 @@ import org.jimmutable.core.serialization.Format;
 import org.jimmutable.core.serialization.reader.HandReader;
 import org.jimmutable.core.utils.Validator;
 
+import net.jdkr.readingrover.auth.DoLogin;
 import net.jdkr.readingrover.util.AuthUtil;
 
 // TODO Make this DoUpsertUser - Requires authenticating the current user and authorizing them to make changes for the affected user
@@ -100,23 +97,11 @@ public class DoUserSignup extends HttpServlet
                 return;
             }
             
-            // TODO Create util method for DoLogin
-            // TODO There is almost certainly a race condition here b/c Search and Storage are inconsistent
-            // Log the user in
+            // TODO There is almost certainly a race condition here b/c Search and Storage are eventually consistent
+            // Log the new user in
+            if (! DoLogin.login(new_user.getSimpleUsername(), password, true))
             {
-                UsernamePasswordToken token = new UsernamePasswordToken(new_user.getSimpleUsername(), password);
-                token.setRememberMe(true);
-                
-                Subject auth_user = SecurityUtils.getSubject();
-                try
-                {
-                    auth_user.login(token);
-                }
-                catch (AuthenticationException e)
-                {
-                    // Failed authentication
-                    LOGGER.trace(e.getMessage());
-                }
+                LOGGER.warn(String.format("Unable to automatically log in %s (%s) after account creation", new_user.getSimpleUsername(), new_user.getSimpleObjectId()));
             }
             
             ServletUtil.writeSerializedResponse(response, new UpsertResponseOK("Success", new_user), UpsertResponseOK.HTTP_STATUS_CODE_OK);

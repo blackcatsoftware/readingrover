@@ -31,6 +31,7 @@ import org.jimmutable.cloud.utils.AppAdminUtil;
 
 import net.jdkr.readingrover.auth.AuthenticationFilter;
 import net.jdkr.readingrover.auth.DoLogin;
+import net.jdkr.readingrover.auth.DoLogout;
 import net.jdkr.readingrover.user.DoUserSignup;
 import net.jdkr.readingrover.util.Log4jOneUtil;
 import net.jdkr.readingrover.util.ViewController;
@@ -50,8 +51,8 @@ public class App
     static
     {
         VIEW_MAPPINGS = new HashMap<>();
-        VIEW_MAPPINGS.put("/", new ServletSpecForwardUri("", "/index/index.jsp"));
-        VIEW_MAPPINGS.put("/index/index.html", new ServletSpecForwardUri("/index/index.html", "/index/index.jsp"));
+        VIEW_MAPPINGS.put("/", new ServletSpecForwardUri("", "/index.jsp"));
+        VIEW_MAPPINGS.put("/index.html", new ServletSpecForwardUri("/index.html", "/index.jsp"));
         
         VIEW_MAPPINGS.put("/public/login", new ServletSpecForwardUri("/public/login", "/public/login.jsp"));
         VIEW_MAPPINGS.put("/public/signup", new ServletSpecForwardUri("/public/signup", "/public/signup.jsp"));
@@ -64,7 +65,9 @@ public class App
         ACTION_MAPPINGS = new HashMap<>();
         
         ACTION_MAPPINGS.put("/public/do-login", DoLogin.class);
+        ACTION_MAPPINGS.put("/public/do-logout", DoLogout.class);
         ACTION_MAPPINGS.put("/public/users/do-signup", DoUserSignup.class);
+        
 //        ACTION_MAPPINGS.put("/public/users/check-username", DoCheckUsername.class);
     }
     
