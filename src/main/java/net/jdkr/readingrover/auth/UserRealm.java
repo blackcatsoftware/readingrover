@@ -43,8 +43,16 @@ public class UserRealm extends AuthorizingRealm
     }
     
     @Override
+    public boolean supports(AuthenticationToken token)
+    {
+        return token instanceof UsernamePasswordToken;
+    }
+
+    @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException
     {
+        if (null == token) return null;
+        
         UsernamePasswordToken user_token = (UsernamePasswordToken) token;
         
         String username = Normalizer.lowerCase(user_token.getUsername());

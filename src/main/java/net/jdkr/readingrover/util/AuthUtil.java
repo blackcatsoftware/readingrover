@@ -39,11 +39,13 @@ public class AuthUtil
     
     static public String encodeSalt(ByteSource salt)
     {
+        if (null == salt) return null;
         return salt.toBase64();
     }
     
     static public ByteSource decodeSalt(String salt)
     {
+        if (null == salt) return null;
         return new SimpleByteSource(Base64.decode(salt));
     }
     
@@ -55,11 +57,13 @@ public class AuthUtil
      */
     static public String encodePassword(byte[] password)
     {
+        if (null == password) return null;
         return Base64.encodeToString(password);
     }
     
     static public byte[] decodePassword(String password)
     {
+        if (null == password) return null;
         return Base64.decode(password);
     }
     

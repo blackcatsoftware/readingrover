@@ -59,7 +59,6 @@ public class DoUserSignup extends HttpServlet
             
             String birthday_raw = reader.readString(User.FIELD_BIRTHDAY.getSimpleFieldName().getSimpleName(), null);
             Validator.notNull(birthday_raw, "Birthday");
-            
             builder.set(User.FIELD_BIRTHDAY, new Day(birthday_raw));
             
             // TODO Send real avatar ID
