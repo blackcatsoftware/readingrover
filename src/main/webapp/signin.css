@@ -6,26 +6,7 @@
   --logo-left-outline: #036D8B;
   --logo-emphasis: #C51F30;
   --logo-foreground: #FFF;
-}
-
-.svglogobackground {
-    fill: var(--logo-background);
-}
-
-#svglogorightoutline {
-    fill: var(--logo-right-outline);
-}
-
-#svglogoleftoutline {
-    fill: var(--logo-left-outline);
-}
-
-#svglogoemphasis {
-    fill: var(--logo-emphasis);
-}
-
-#svglogoforeground {
-    fill: var(--logo-foreground);
+  --everything-base: #f5f5f5;
 }
 
 html,
@@ -37,11 +18,10 @@ body {
 body {
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-align: center;
-  align-items: center;
+  align-items: flex-start;
   padding-top: 40px;
-  padding-bottom: 40px;
-  background-color: #f5f5f5;
+  padding-bottom: 20px;
+  background-color: var(--everything-base);
 }
 
 .form-signin {
@@ -107,10 +87,6 @@ body {
   color: #777;
 }
 
-.navbar {
-  margin-bottom: 20px;
-}
-
 /*
  * Open dropdowns on hover instead of click.
  */
@@ -132,4 +108,13 @@ body {
     color: #fff;
     text-decoration: none;
     background-color: var(--logo-background);
+}
+
+.hover-underline-menu .navbar-nav#underline-links a {
+  border-bottom: 0.125rem solid var(--everything-base);
+}
+
+.hover-underline-menu .navbar-nav#underline-links a:hover:not(.disabled) {
+  border-bottom-color: var(--logo-right-outline);
+  transition: all 1s ease;
 }
