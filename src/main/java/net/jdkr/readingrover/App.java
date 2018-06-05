@@ -26,7 +26,6 @@ import org.jimmutable.cloud.ApplicationId;
 import org.jimmutable.cloud.CloudExecutionEnvironment;
 import org.jimmutable.cloud.DefaultJetty2Log4j2Bridge;
 import org.jimmutable.cloud.EnvironmentType;
-import org.jimmutable.cloud.logging.Log4jUtil;
 import org.jimmutable.cloud.utils.AppAdminUtil;
 
 import net.jdkr.readingrover.auth.AuthenticationFilter;
@@ -134,7 +133,7 @@ public class App
         
         // Configure log4j 1.x
         Log4jOneUtil.setupListeners();
-        Log4jOneUtil.setAllLoggerLevels(Log4jUtil.getCurrentLogLevel());
+        Log4jOneUtil.setAllLoggerLevels(LogManager.getRootLogger().getLevel());
 
         DevStartupData.upsertAllStartupData();
         

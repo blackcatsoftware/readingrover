@@ -77,7 +77,7 @@ public class UserTest extends StubTest
         User required_only = builder.create(null);
         
         assertNotNull(required_only);
-        assertEquals(required_only.getSimpleKind(), User.KIND);
+        assertEquals(User.KIND, required_only.getSimpleKind());
         assertFalse(required_only.hasEmailAddress());
         
         builder = new Builder(required_only);
@@ -87,15 +87,15 @@ public class UserTest extends StubTest
         User getter_test = builder.create(null);
         assertNotNull(getter_test);
         
-        assertEquals(getter_test.getSimpleObjectId(), ID);
-        assertEquals(getter_test.getSimpleUsername(), USERNAME);
-        assertEquals(getter_test.getOptionalEmailAddress(null), EMAIL_ADDRESS);
-        assertEquals(getter_test.getSimpleFirstName(), FIRST_NAME);
-        assertEquals(getter_test.getSimpleLastInitial(), LAST_INITIAL);
-        assertEquals(getter_test.getSimpleBirthday(), BIRTHDAY);
-        assertEquals(getter_test.getSimpleAvatarId(), AVATAR_ID);
-        assertEquals(getter_test.getSimplePasswordHash(), PASSWORD_HASH);
-        assertEquals(getter_test.getSimplePasswordSalt(), PASSWORD_SALT);
+        assertEquals(ID, getter_test.getSimpleObjectId());
+        assertEquals(USERNAME, getter_test.getSimpleUsername());
+        assertEquals(EMAIL_ADDRESS, getter_test.getOptionalEmailAddress(null));
+        assertEquals(FIRST_NAME, getter_test.getSimpleFirstName());
+        assertEquals(LAST_INITIAL, getter_test.getSimpleLastInitial());
+        assertEquals(BIRTHDAY, getter_test.getSimpleBirthday());
+        assertEquals(AVATAR_ID, getter_test.getSimpleAvatarId());
+        assertEquals(PASSWORD_HASH, getter_test.getSimplePasswordHash());
+        assertEquals(PASSWORD_SALT, getter_test.getSimplePasswordSalt());
         
         System.out.println(getter_test.toJavaCode(Format.JSON_PRETTY_PRINT, "obj"));
     }
@@ -110,7 +110,7 @@ public class UserTest extends StubTest
                         , "  \"username\" : \"username\","
                         , "  \"email_address\" : \"email@address.com\","
                         , "  \"first_name\" : \"First\","
-                        , "  \"last_name\" : \"L\","
+                        , "  \"last_initial\" : \"L\","
                         , "  \"birthday\" : \"01/02/2003\","
                         , "  \"avatar_id\" : \"0000-0000-0000-03db\","
                         , "  \"password_hash\" : \"password#hash\","
@@ -119,11 +119,15 @@ public class UserTest extends StubTest
                    );
         User user = (User) StandardObject.deserialize(obj_string);
         
-        assertEquals(user.getSimpleObjectId(), ID);
-        assertEquals(user.getSimpleUsername(), USERNAME);
-        assertEquals(user.getOptionalEmailAddress(null), EMAIL_ADDRESS);
-        assertEquals(user.getSimplePasswordHash(), PASSWORD_HASH);
-        assertEquals(user.getSimplePasswordSalt(), PASSWORD_SALT);
+        assertEquals(ID, user.getSimpleObjectId());
+        assertEquals(USERNAME, user.getSimpleUsername());
+        assertEquals(EMAIL_ADDRESS, user.getOptionalEmailAddress(null));
+        assertEquals(FIRST_NAME, user.getSimpleFirstName());
+        assertEquals(LAST_INITIAL, user.getSimpleLastInitial());
+        assertEquals(BIRTHDAY, user.getSimpleBirthday());
+        assertEquals(AVATAR_ID, user.getSimpleAvatarId());
+        assertEquals(PASSWORD_HASH, user.getSimplePasswordHash());
+        assertEquals(PASSWORD_SALT, user.getSimplePasswordSalt());
             
         assertEquals(obj_string, user.serialize(Format.JSON_PRETTY_PRINT));
     }
