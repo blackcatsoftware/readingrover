@@ -32,6 +32,7 @@ import net.jdkr.readingrover.auth.AuthenticationFilter;
 import net.jdkr.readingrover.auth.DoLogin;
 import net.jdkr.readingrover.auth.DoLogout;
 import net.jdkr.readingrover.user.DoUserSignup;
+import net.jdkr.readingrover.user.avatar.DoSearchAvatars;
 import net.jdkr.readingrover.util.Log4jOneUtil;
 import net.jdkr.readingrover.util.ViewController;
 
@@ -57,6 +58,9 @@ public class App
         VIEW_MAPPINGS.put("/public/signup", new ServletSpecForwardUri("/public/signup", "/public/signup.jsp"));
         
         VIEW_MAPPINGS.put("/home", new ServletSpecForwardUri("/home", "/home.jsp"));
+        
+        VIEW_MAPPINGS.put("/admin/avatars/search", new ServletSpecForwardUri("/admin/avatars/search", "/admin/avatar/search-avatars.jsp"));
+        VIEW_MAPPINGS.put("/admin/avatars/edit", new ServletSpecForwardUri("/admin/avatars/edit", "/admin/avatar/edit-avatar.jsp"));
     }
     
     static
@@ -68,6 +72,9 @@ public class App
         ACTION_MAPPINGS.put("/public/users/do-signup", DoUserSignup.class);
         
 //        ACTION_MAPPINGS.put("/public/users/check-username", DoCheckUsername.class);
+        
+        ACTION_MAPPINGS.put("/admin/avatars/do-search", DoSearchAvatars.class);
+        ACTION_MAPPINGS.put("/admin/avatars/do-upsert", DoUpsertAvatars.class);
     }
     
     static public class ServletSpecForwardUri

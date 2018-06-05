@@ -1,4 +1,4 @@
-package net.jdkr.readingrover.user;
+package net.jdkr.readingrover.user.avatar;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

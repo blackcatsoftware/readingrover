@@ -30,7 +30,7 @@ import net.jdkr.readingrover.util.AuthUtil;
 @SuppressWarnings("serial")
 public class DoUserSignup extends HttpServlet
 {
-    private static final Logger LOGGER = LogManager.getLogger(DoUserSignup.class);
+    static private final Logger LOGGER = LogManager.getLogger(DoUserSignup.class);
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException

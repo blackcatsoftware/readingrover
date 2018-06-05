@@ -1,4 +1,4 @@
-package net.jdkr.readingrover.user;
+package net.jdkr.readingrover.user.avatar;
 
 import java.util.Objects;
 

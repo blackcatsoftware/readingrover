@@ -6,8 +6,8 @@ import org.jimmutable.core.serialization.JimmutableTypeNameRegister;
 import org.jimmutable.core.serialization.reader.ObjectParseTree;
 
 import net.jdkr.readingrover.auth.LoginResponseFailure;
-import net.jdkr.readingrover.user.Avatar;
 import net.jdkr.readingrover.user.User;
+import net.jdkr.readingrover.user.avatar.Avatar;
 
 
 
