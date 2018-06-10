@@ -66,7 +66,7 @@
                         event.preventDefault();
 
                         const data = new FormData();
-                        data.set('file', this.avatar_file_input);
+                        data.set('file', app.$refs.avatar_file_input.file);
                         data.set('json',
                         {
                             id: this.avatar.id,

@@ -33,6 +33,7 @@ import net.jdkr.readingrover.auth.DoLogin;
 import net.jdkr.readingrover.auth.DoLogout;
 import net.jdkr.readingrover.user.DoUserSignup;
 import net.jdkr.readingrover.user.avatar.DoSearchAvatars;
+import net.jdkr.readingrover.user.avatar.DoUpsertAvatar;
 import net.jdkr.readingrover.util.Log4jOneUtil;
 import net.jdkr.readingrover.util.ViewController;
 
@@ -74,7 +75,7 @@ public class App
 //        ACTION_MAPPINGS.put("/public/users/check-username", DoCheckUsername.class);
         
         ACTION_MAPPINGS.put("/admin/avatars/do-search", DoSearchAvatars.class);
-        ACTION_MAPPINGS.put("/admin/avatars/do-upsert", DoUpsertAvatars.class);
+        ACTION_MAPPINGS.put("/admin/avatars/do-upsert", DoUpsertAvatar.class);
     }
     
     static public class ServletSpecForwardUri
