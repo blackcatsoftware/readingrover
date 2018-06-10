@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="/public/images/favicon.ico">
 
     <title>Create an account</title>
 
@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
 
     <!-- Custom styles for this template -->
-    <link href="signin.css" rel="stylesheet">
+    <link href="/public/css/css.css" rel="stylesheet">
 
     <script src="https://unpkg.com/vue@2.5.16/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -50,11 +50,8 @@
     <form id="app" class="form-signin" style="max-width: 560px">
       <div class="text-center mb-4">
         
-        <svg class="Logo">
-            <use id="top-image" xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#SVGReadingRoverLogo">
-            </use>            
-        </svg>
-          
+        <img src="/public/images/logo.svg" width="148" height="148" alt="">
+
         <h1 class="h3 mb-3 font-weight-normal">Reading Rover</h1>
         <p>Making reading fun for kids!</p>
       </div>
