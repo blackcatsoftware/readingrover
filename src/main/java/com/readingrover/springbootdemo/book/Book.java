@@ -1,10 +1,14 @@
 package com.readingrover.springbootdemo.book;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 public class Book
@@ -19,7 +23,7 @@ public class Book
     @Column(nullable = false)
     private String author;
 
-    
+    @JsonProperty("id")
     public long getSimpleId()
     {
         return id;
@@ -30,6 +34,7 @@ public class Book
         this.id = id;
     }
 
+    @JsonProperty("title")
     public String getSimpleTitle()
     {
         return title;
@@ -40,6 +45,7 @@ public class Book
         this.title = title;
     }
 
+    @JsonProperty("author")
     public String getSimpleAuthor()
     {
         return author;
@@ -48,5 +54,11 @@ public class Book
     public void setAuthor(String author)
     {
         this.author = author;
+    }
+    
+    @JsonProperty("hash")
+    public long getComplexSyntheticProp()
+    {
+        return Objects.hash(title, author);
     }
 }
