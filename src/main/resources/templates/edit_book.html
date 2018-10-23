@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <title>Edit Book</title>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    </head>
+    <body>
+        <h1>Edit Book</h1>
+        <div id="app">
+            <div v-show="!loaded">
+                Loading...
+            </div>
+            <div v-show="loaded" style="display:none">
+                <label for="title">Title</label><br/>
+                <input type="text" id="title" name="title" placeholder="Enter Book Title" v-model="book.title" /><br/>
+                <br/>
+                <label for="author">Author</label><br/>
+                <input type="text" id="author" name="author" placeholder="Enter Author Name" v-model="book.author" /><br/>
+                <br/>
+                <input type="button" value="Discard Changes" @click="onCancel"/>
+                <input type="button" value="Save" @click="onSave"/>
+            </div>
+        </div>
+
+        <script>
+            new Vue({
+                el: '#app',
+                data:
+                {
+                    id: [[${id}]],
+                    book: {},
+                    loaded: false
+                },
+                created()
+                {
+                    if (this.id >= 0)
+                    {
+                        axios.get('/api/books/' + this.id)
+                             .then(response=>
+                             {
+                                this.book=response.data;
+                             })
+                             .catch(error=>
+                             {
+                                console.log(error);
+                                alert(error);
+                             });
+                    }
+                    else
+                    {
+                        this.book.id = this.id;
+                        // Other properties set via UI or API
+                    }
+
+                    this.loaded = true;
+                },
+                methods:
+                {
+                    onSave(evt)
+                    {
+                        evt.preventDefault();
+                        // TODO Validation
+
+                        let cmd = this.id < 0 ? axios.post("/api/books", this.book) : axios.put("/api/books/" + this.id, this.book);
+
+                        cmd.then(response=>
+                        {
+                            alert("Book " + (this.id < 0 ? "created!" : "saved!"));
+                            window.location.href = "/books";
+                        })
+                        .catch(error=>
+                        {
+                            console.log(error);
+                            alert(error);
+                        });
+                    },
+                    onCancel()
+                    {
+                        window.location.href = "/books";
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>

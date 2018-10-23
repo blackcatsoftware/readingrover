@@ -1,0 +1,91 @@
+<html>
+    <head>
+        <title>Manage Books</title>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+        <style>
+        table {
+            width: 100%;
+        }
+        th {
+            border: 2px solid black;
+        }
+        td {
+            border: 1px solid black;
+        }
+        td:hover {
+            cursor: pointer;
+            background-color: aliceblue;
+        }
+        </style>
+    </head>
+    <body>
+        <h1>Manage Books</h1>
+        <div id="app">
+            <div>
+                <input type="text" name="search-text" placeholder="Search Text" v-model="search_text" />
+                <input type="button" value="Search" @click="onSearch"/>
+                <input type="button" value="New Book" @click="onCreate"/>
+            </div>
+            <br/>
+            <div>
+                <table>
+                    <tbody>
+                        <tr v-for="book in books" @click="onClickRow(book)">
+                            <td>{{ book.title }}</td>
+                            <td>{{ book.author }}</td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <th>Title</th>
+                        <th>Author</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            new Vue({
+                el: '#app',
+                data:
+                {
+                    books: [],
+                    search_text: ""
+                },
+                methods:
+                {
+                    onSearch()
+                    {
+                        console.log("Search: '" + this.search_text + "'");
+
+                        axios.get('/api/books')
+                             .then(response=>
+                             {
+                                this.books=response.data;
+                                console.log("Books: " + this.books);
+                             })
+                             .catch(error=>
+                             {
+                                console.log(error);
+                                alert(error);
+                             });
+                    },
+                    onCreate()
+                    {
+                        window.location.href = "/books/-1";
+                    },
+                    onClickRow(book)
+                    {
+                        window.location.href = "/books/" + book.id;
+                    }
+                },
+                created()
+                {
+                    this.onSearch();
+                }
+            })
+        </script>
+    </body>
+</html>
