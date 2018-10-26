@@ -1,4 +1,4 @@
-package com.readingrover.springbootdemo.book;
+package com.readingrover.springbootdemo.data.api.book;
 
 import javax.validation.ConstraintViolationException;
 

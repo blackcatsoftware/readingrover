@@ -6,8 +6,22 @@
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
         <style>
+        #app {
+            max-width: 500px;
+        }
+        div.container {
+            width: 100%;
+        }
+        #search-text {
+            min-width: 235px;
+        }
         table {
             width: 100%;
+            border-collapse: collapse;
+
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
         th {
             border: 2px solid black;
@@ -15,7 +29,7 @@
         td {
             border: 1px solid black;
         }
-        td:hover {
+        tr:hover {
             cursor: pointer;
             background-color: aliceblue;
         }
@@ -24,21 +38,23 @@
     <body>
         <h1>Manage Books</h1>
         <div id="app">
-            <div>
-                <input type="text" name="search-text" placeholder="Search Text" v-model="search_text" />
+            <div class="container">
+                <input type="text" id="search-text" name="search-text" placeholder="Search Text" v-model="search_text" @keyup.enter="onSearch" />
                 <input type="button" value="Search" @click="onSearch"/>
                 <input type="button" value="New Book" @click="onCreate"/>
             </div>
             <br/>
-            <div>
+            <div class="container">
                 <table>
                     <tbody>
                         <tr v-for="book in books" @click="onClickRow(book)">
+                            <td>{{ book.id }}</td>
                             <td>{{ book.title }}</td>
                             <td>{{ book.author }}</td>
                         </tr>
                     </tbody>
                     <thead>
+                        <th>ID</th>
                         <th>Title</th>
                         <th>Author</th>
                     </thead>
@@ -60,7 +76,16 @@
                     {
                         console.log("Search: '" + this.search_text + "'");
 
-                        axios.get('/api/books')
+                        if (this.search_text)
+                        {
+                            var url = encodeURI("/api/books/title/" + this.search_text);
+                        }
+                        else
+                        {
+                            var url = '/api/books';
+                        }
+
+                        axios.get(url)
                              .then(response=>
                              {
                                 this.books=response.data;

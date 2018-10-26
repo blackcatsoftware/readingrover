@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/books")
-public class BookViewController
+public class MangeBooksController
 {
     @GetMapping
     public String list(Model model)

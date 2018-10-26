@@ -19,7 +19,7 @@
                 <input type="text" id="author" name="author" placeholder="Enter Author Name" v-model="book.author" /><br/>
                 <br/>
                 <input type="button" value="Discard Changes" @click="onCancel"/>
-                <input type="button" value="Save" @click="onSave"/>
+                <input type="button" value="Save" @click.prevent="onSave"/>
             </div>
         </div>
 
@@ -59,9 +59,6 @@
                 {
                     onSave(evt)
                     {
-                        evt.preventDefault();
-                        // TODO Validation
-
                         let cmd = this.id < 0 ? axios.post("/api/books", this.book) : axios.put("/api/books/" + this.id, this.book);
 
                         cmd.then(response=>

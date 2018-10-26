@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.readingrover.springbootdemo.book.Book;
+import com.readingrover.springbootdemo.data.model.Book;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;

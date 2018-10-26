@@ -1,4 +1,4 @@
-package com.readingrover.springbootdemo.book;
+package com.readingrover.springbootdemo.data.api.book;
 
 import java.util.List;
 
@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.readingrover.springbootdemo.data.model.Book;
+import com.readingrover.springbootdemo.data.repos.BookRepository;
 
 @RestController
 @RequestMapping("/api/books")
@@ -30,7 +33,7 @@ public class BookApiController
     @GetMapping("/title/{book_title}")
     public List<Book> findByTyitle(@PathVariable String book_title)
     {
-        return repo.findByTitle(book_title);
+        return repo.findByTextSearch(book_title);
     }
     
     @GetMapping("/{id}")

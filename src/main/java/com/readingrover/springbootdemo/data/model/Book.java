@@ -1,4 +1,4 @@
-package com.readingrover.springbootdemo.book;
+package com.readingrover.springbootdemo.data.model;
 
 import java.util.Objects;
 
@@ -10,6 +10,7 @@ import javax.persistence.Id;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
 @Entity
 public class Book
 {
@@ -17,12 +18,13 @@ public class Book
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String title;
     
     @Column(nullable = false)
     private String author;
 
+    
     @JsonProperty("id")
     public long getSimpleId()
     {
@@ -55,10 +57,24 @@ public class Book
     {
         this.author = author;
     }
-    
-    @JsonProperty("hash")
-    public long getComplexSyntheticProp()
+
+    @Override
+    public boolean equals(Object obj)
     {
-        return Objects.hash(title, author);
+        if (! (obj instanceof Book)) return false;
+        
+        Book other = (Book) obj;
+        
+        if (getSimpleId() != other.getSimpleId()) return false;
+        if (! Objects.equals(title, other.title)) return false;
+        if (! Objects.equals(author, other.author)) return false;
+        
+        return true;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("\"%s\" by %s (%d)", title, author, id);
     }
 }

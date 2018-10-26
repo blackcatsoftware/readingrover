@@ -16,5 +16,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
             .anyRequest().permitAll()
             .and()
             .csrf().disable();
+        
+        http.headers().frameOptions().sameOrigin();
     }
 }
