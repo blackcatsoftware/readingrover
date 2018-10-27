@@ -14,5 +14,5 @@ public interface BookRepository extends CrudRepository<Book, Long>
     @Query("FROM Book b "
          + "WHERE LOWER(b.title) LIKE LOWER(CONCAT('%', :text, '%')) "
             + "OR LOWER(b.author) LIKE LOWER(CONCAT('%', :text, '%'))")
-    List<Book> findByTextSearch(@Param("text") String text);
+    List<Book> findByTitleOrAuthor(@Param("text") String text);
 }

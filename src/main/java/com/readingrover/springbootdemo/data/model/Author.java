@@ -19,9 +19,11 @@ public class Author
     private long id;
     
     @Column(nullable = false)
+    @JsonProperty("first_name")
     private String first_name;
     
     @Column(nullable = false)
+    @JsonProperty("last_name")
     private String last_name;
 
     
@@ -36,26 +38,26 @@ public class Author
         this.id = id;
     }
 
-    @JsonProperty("first_name")
-    public String getSimpleTitle()
+    public String getSimpleFirstName()
     {
         return first_name;
     }
 
-    public void setFirstName(String first_name)
+    public Author setFirstName(String first_name)
     {
         this.first_name = first_name;
+        return this;
     }
 
-    @JsonProperty("last_name")
-    public String getSimpleAuthor()
+    public String getSimpleLastName()
     {
         return last_name;
     }
 
-    public void setLastName(String last_name)
+    public Author setLastName(String last_name)
     {
         this.last_name = last_name;
+        return this;
     }
 
     @Override

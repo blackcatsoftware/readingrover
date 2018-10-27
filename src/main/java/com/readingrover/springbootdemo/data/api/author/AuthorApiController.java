@@ -1,4 +1,4 @@
-package com.readingrover.springbootdemo.data.api.book;
+package com.readingrover.springbootdemo.data.api.author;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,18 +13,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.readingrover.springbootdemo.data.model.Book;
-import com.readingrover.springbootdemo.data.repos.BookRepository;
+import com.readingrover.springbootdemo.data.model.Author;
+import com.readingrover.springbootdemo.data.repos.AuthorRepository;
+
 
 @RestController
-@RequestMapping("/api/books")
-public class BookApiController
+@RequestMapping("/api/authors")
+public class AuthorApiController
 {
     @Autowired
-    private BookRepository repo;
+    private AuthorRepository repo;
     
     @GetMapping
-    public Iterable<Book> search(@RequestParam(value="q", required=false) String text)
+    public Iterable<Author> search(@RequestParam(value="q", required=false) String text)
     {
         if (null == text || text.isEmpty())
         {
@@ -32,37 +33,37 @@ public class BookApiController
         }
         else
         {
-            return repo.findByTitleOrAuthor(text);
+            return repo.findByName(text);
         }
     }
     
-    
     @GetMapping("/{id}")
-    public Book findById(@PathVariable Long id)
+    public Author findById(@PathVariable Long id)
     {
-        return repo.findById(id).orElseThrow(BookNotFoundException::new);
+        return repo.findById(id).orElseThrow(AuthorNotFoundException::new);
     }
     
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Book create(@RequestBody Book book)
+    public Author create(@RequestBody Author author)
     {
-        return repo.save(book);
+        System.out.println(author);
+        return repo.save(author);
     }
     
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id)
     {
-        repo.findById(id).orElseThrow(BookNotFoundException::new);
+        repo.findById(id).orElseThrow(AuthorNotFoundException::new);
         repo.deleteById(id);
     }
     
     @PutMapping("/{id}")
-    public Book update(@PathVariable Long id, @RequestBody Book book)
+    public Author update(@PathVariable Long id, @RequestBody Author Author)
     {
-        if (id != book.getSimpleId()) throw new BookIdMismatchException();
+        if (id != Author.getSimpleId()) throw new AuthorIdMismatchException();
         
-        repo.findById(id).orElseThrow(BookNotFoundException::new);
-        return repo.save(book);
+        repo.findById(id).orElseThrow(AuthorNotFoundException::new);
+        return repo.save(Author);
     }
 }

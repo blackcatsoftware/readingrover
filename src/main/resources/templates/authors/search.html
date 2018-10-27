@@ -1,0 +1,106 @@
+<html>
+    <head>
+        <title>Manage Authors</title>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+        <style>
+        #app {
+            max-width: 500px;
+        }
+        div.container {
+            width: 100%;
+        }
+        #search-text {
+            min-width: 235px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        th {
+            border: 2px solid black;
+        }
+        td {
+            border: 1px solid black;
+        }
+        tr:hover {
+            cursor: pointer;
+            background-color: aliceblue;
+        }
+        </style>
+    </head>
+    <body>
+        <h1>Manage Authors</h1>
+        <div id="app">
+            <div class="container">
+                <input type="text" id="search-text" name="search-text" placeholder="Search Text" v-model="search_text" @keyup.enter="onSearch" />
+                <input type="button" value="Search" @click="onSearch"/>
+                <input type="button" value="New Author" @click="onCreate"/>
+            </div>
+            <br/>
+            <div class="container">
+                <table>
+                    <tbody>
+                        <tr v-for="author in authors" @click="onClickRow(author)">
+                            <td>{{ author.id }}</td>
+                            <td>{{ author.first_name + ' ' + author.last_name }}</td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <th>ID</th>
+                        <th>Name</th>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            new Vue({
+                el: '#app',
+                data:
+                {
+                    authors: [],
+                    search_text: ""
+                },
+                methods:
+                {
+                    onSearch()
+                    {
+                        console.log("Search: '" + this.search_text + "'");
+
+                        var url = encodeURI("/api/authors?q=" + this.search_text);
+                        axios.get(url)
+                             .then(response=>
+                             {
+                                this.authors=response.data;
+                                console.log("Authors: " + this.authors);
+                             })
+                             .catch(error=>
+                             {
+                                console.log(error);
+                                alert(error);
+                             });
+                    },
+                    onCreate()
+                    {
+                        window.location.href = "/authors/-1";
+                    },
+                    onClickRow(author)
+                    {
+                        window.location.href = "/authors/" + author.id;
+                    }
+                },
+                created()
+                {
+                    this.onSearch();
+                }
+            })
+        </script>
+    </body>
+</html>

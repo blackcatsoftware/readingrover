@@ -76,15 +76,7 @@
                     {
                         console.log("Search: '" + this.search_text + "'");
 
-                        if (this.search_text)
-                        {
-                            var url = encodeURI("/api/books/title/" + this.search_text);
-                        }
-                        else
-                        {
-                            var url = '/api/books';
-                        }
-
+                        var url = encodeURI("/api/books?q=" + this.search_text);
                         axios.get(url)
                              .then(response=>
                              {

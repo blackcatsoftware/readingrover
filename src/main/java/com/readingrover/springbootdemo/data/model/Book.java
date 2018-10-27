@@ -19,9 +19,11 @@ public class Book
     private long id;
     
     @Column(nullable = false)
+    @JsonProperty("title")
     private String title;
     
     @Column(nullable = false)
+    @JsonProperty("author")
     private String author;
 
     
@@ -36,26 +38,26 @@ public class Book
         this.id = id;
     }
 
-    @JsonProperty("title")
     public String getSimpleTitle()
     {
         return title;
     }
 
-    public void setTitle(String title)
+    public Book setTitle(String title)
     {
         this.title = title;
+        return this;
     }
 
-    @JsonProperty("author")
     public String getSimpleAuthor()
     {
         return author;
     }
 
-    public void setAuthor(String author)
+    public Book setAuthor(String author)
     {
         this.author = author;
+        return this;
     }
 
     @Override

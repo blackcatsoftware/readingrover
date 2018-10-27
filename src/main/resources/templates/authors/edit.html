@@ -1,0 +1,83 @@
+<html>
+    <head>
+        <title>Edit Author</title>
+
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    </head>
+    <body>
+        <h1>Edit Author</h1>
+        <div id="app">
+            <div v-show="!loaded">
+                Loading...
+            </div>
+            <div v-show="loaded" style="display:none">
+                <label for="first_name">First Name</label><br/>
+                <input type="text" id="first_name" name="first_name" placeholder="Enter First Name" v-model="author.first_name" /><br/>
+                <br/>
+                <label for="last_name">Last Name</label><br/>
+                <input type="text" id="last_name" name="last_name" placeholder="Enter Last Name" v-model="author.last_name" /><br/>
+                <br/>
+                <input type="button" value="Discard Changes" @click="onCancel"/>
+                <input type="button" value="Save" @click.prevent="onSave"/>
+            </div>
+        </div>
+
+        <script>
+            new Vue({
+                el: '#app',
+                data:
+                {
+                    id: [[${id}]],
+                    author: {},
+                    loaded: false
+                },
+                created()
+                {
+                    if (this.id >= 0)
+                    {
+                        axios.get('/api/authors/' + this.id)
+                             .then(response=>
+                             {
+                                this.author=response.data;
+                             })
+                             .catch(error=>
+                             {
+                                console.log(error);
+                                alert(error);
+                             });
+                    }
+                    else
+                    {
+                        this.author.id = this.id;
+                        // Other properties set via UI or API
+                    }
+
+                    this.loaded = true;
+                },
+                methods:
+                {
+                    onSave(evt)
+                    {
+                        let cmd = this.id < 0 ? axios.post("/api/authors", this.author) : axios.put("/api/authors/" + this.id, this.author);
+
+                        cmd.then(response=>
+                        {
+                            alert("Author " + (this.id < 0 ? "created!" : "saved!"));
+                            window.location.href = "/authors";
+                        })
+                        .catch(error=>
+                        {
+                            console.log(error);
+                            alert(error);
+                        });
+                    },
+                    onCancel()
+                    {
+                        window.location.href = "/authors";
+                    }
+                }
+            })
+        </script>
+    </body>
+</html>

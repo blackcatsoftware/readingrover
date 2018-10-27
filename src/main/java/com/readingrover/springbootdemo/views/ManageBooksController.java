@@ -9,18 +9,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/books")
-public class MangeBooksController
+public class ManageBooksController
 {
     @GetMapping
     public String list(Model model)
     {
-        return "books"; // Name of file ("template")
+        return "books/search"; // Name of file ("template")
     }
     
     @GetMapping("/{id}")
     public String edit(Model model, @PathVariable Long id)
     {
         model.addAttribute("id", id);
-        return "edit_book"; // Name of file ("template")
+        return "books/edit"; // Name of file ("template")
     }
 }
