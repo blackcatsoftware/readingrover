@@ -28,29 +28,29 @@
                 el: '#app',
                 data:
                 {
-                    id: [[${id}]],
+                    href: '[[${href}]]',
                     author: {},
                     loaded: false
                 },
                 created()
                 {
-                    if (this.id >= 0)
+                    if (this.href)
                     {
-                        axios.get('/api/authors/' + this.id)
+                        axios.get(this.href)
                              .then(response=>
                              {
-                                this.author=response.data;
+                                this.author =
+                                {
+                                    "first_name": response.data.first_name,
+                                    "last_name": response.data.last_name
+                                }
+                                console.log(this.author);
                              })
                              .catch(error=>
                              {
                                 console.log(error);
                                 alert(error);
                              });
-                    }
-                    else
-                    {
-                        this.author.id = this.id;
-                        // Other properties set via UI or API
                     }
 
                     this.loaded = true;
@@ -59,11 +59,11 @@
                 {
                     onSave(evt)
                     {
-                        let cmd = this.id < 0 ? axios.post("/api/authors", this.author) : axios.put("/api/authors/" + this.id, this.author);
+                        let cmd = this.href ? axios.put(this.href, this.author) : axios.post("/api/authors", this.author);
 
                         cmd.then(response=>
                         {
-                            alert("Author " + (this.id < 0 ? "created!" : "saved!"));
+                            alert("Author " + (this.href ? "saved!" : "created!"));
                             window.location.href = "/authors";
                         })
                         .catch(error=>

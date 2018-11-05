@@ -7,28 +7,29 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-@Entity
+@Entity(name = "author")
 public class Author
 {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     
-    @Column(nullable = false)
-    @JsonProperty("first_name")
+    @NotNull
+    @Column(name = "first_name", nullable = false)
     private String first_name;
     
-    @Column(nullable = false)
-    @JsonProperty("last_name")
+    @NotNull
+    @Column(name = "last_name", nullable = false)
     private String last_name;
 
     
     @JsonProperty("id")
-    public long getSimpleId()
+    public long getId()
     {
         return id;
     }
@@ -38,7 +39,8 @@ public class Author
         this.id = id;
     }
 
-    public String getSimpleFirstName()
+    @JsonProperty("first_name")
+    public String getFirstName()
     {
         return first_name;
     }
@@ -49,7 +51,8 @@ public class Author
         return this;
     }
 
-    public String getSimpleLastName()
+    @JsonProperty("last_name")
+    public String getLastName()
     {
         return last_name;
     }
@@ -67,7 +70,7 @@ public class Author
         
         Author other = (Author) obj;
         
-        if (getSimpleId() != other.getSimpleId()) return false;
+        if (getId() != other.getId()) return false;
         if (! Objects.equals(first_name, other.first_name)) return false;
         if (! Objects.equals(last_name, other.last_name)) return false;
         

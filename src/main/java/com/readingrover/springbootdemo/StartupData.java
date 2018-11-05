@@ -23,26 +23,26 @@ public class StartupData
         @Override
         public void run(ApplicationArguments args) throws Exception
         {
-            Book book;
-            book = new Book()
-                       .setAuthor("Herman Melville")
-                       .setTitle("Moby-Dick");
-            repo.save(book);
-            
-            book = new Book()
-                       .setAuthor("Chester Gould")
-                       .setTitle("Dick Tracy");
-            repo.save(book);
-            
-            book = new Book()
-                       .setAuthor("Jane Austen")
-                       .setTitle("Emma");
-            repo.save(book);
-            
-            book = new Book()
-                       .setAuthor("Jane Austen")
-                       .setTitle("Sense and Sensibility");
-            repo.save(book);
+//            Book book;
+//            book = new Book()
+//                       .setTitle("Moby-Dick")
+//                       .addAuthor(author);
+//            repo.save(book);
+//            
+//            book = new Book()
+//                       .setAuthor("Chester Gould")
+//                       .setTitle("Dick Tracy");
+//            repo.save(book);
+//            
+//            book = new Book()
+//                       .setAuthor("Jane Austen")
+//                       .setTitle("Emma");
+//            repo.save(book);
+//            
+//            book = new Book()
+//                       .setAuthor("Jane Austen")
+//                       .setTitle("Sense and Sensibility");
+//            repo.save(book);
         }
     }
     

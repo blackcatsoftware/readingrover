@@ -1,9 +1,9 @@
 package com.readingrover.springbootdemo.views;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 
@@ -17,10 +17,10 @@ public class ManageBooksController
         return "books/search"; // Name of file ("template")
     }
     
-    @GetMapping("/{id}")
-    public String edit(Model model, @PathVariable Long id)
+    @GetMapping("/edit")
+    public String edit(Model model, @Param("href") String href)
     {
-        model.addAttribute("id", id);
+        model.addAttribute("href", href);
         return "books/edit"; // Name of file ("template")
     }
 }

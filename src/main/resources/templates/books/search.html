@@ -48,15 +48,13 @@
                 <table>
                     <tbody>
                         <tr v-for="book in books" @click="onClickRow(book)">
-                            <td>{{ book.id }}</td>
                             <td>{{ book.title }}</td>
                             <td>{{ book.author }}</td>
                         </tr>
                     </tbody>
                     <thead>
-                        <th>ID</th>
                         <th>Title</th>
-                        <th>Author</th>
+                        <th>Authors</th>
                     </thead>
                 </table>
             </div>
@@ -80,7 +78,18 @@
                         axios.get(url)
                              .then(response=>
                              {
-                                this.books=response.data;
+                                let hal_books = response.data._embedded.books;
+                                for (let idx = 0; idx < hal_books.length; idx++)
+                                {
+                                    let hal_book = hal_books[idx];
+                                    let book =
+                                    {
+                                        'title': hal_book.title,
+                                        'link': hal_book._links.self.href
+                                    }
+                                    console.log(book);
+                                    this.books.push(book);
+                                }
                                 console.log("Books: " + this.books);
                              })
                              .catch(error=>
@@ -91,11 +100,11 @@
                     },
                     onCreate()
                     {
-                        window.location.href = "/books/-1";
+                        window.location.href = "/books/edit";
                     },
                     onClickRow(book)
                     {
-                        window.location.href = "/books/" + book.id;
+                        window.location.href = "/books/edit?href=" + book.link;
                     }
                 },
                 created()

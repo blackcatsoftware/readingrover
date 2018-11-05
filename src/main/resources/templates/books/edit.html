@@ -15,9 +15,6 @@
                 <label for="title">Title</label><br/>
                 <input type="text" id="title" name="title" placeholder="Enter Book Title" v-model="book.title" /><br/>
                 <br/>
-                <label for="author">Author</label><br/>
-                <input type="text" id="author" name="author" placeholder="Enter Author Name" v-model="book.author" /><br/>
-                <br/>
                 <input type="button" value="Discard Changes" @click="onCancel"/>
                 <input type="button" value="Save" @click.prevent="onSave"/>
             </div>
@@ -28,15 +25,15 @@
                 el: '#app',
                 data:
                 {
-                    id: [[${id}]],
+                    href: '[[${href}]]',
                     book: {},
                     loaded: false
                 },
                 created()
                 {
-                    if (this.id >= 0)
+                    if (this.href)
                     {
-                        axios.get('/api/books/' + this.id)
+                        axios.get(this.href)
                              .then(response=>
                              {
                                 this.book=response.data;
@@ -47,11 +44,6 @@
                                 alert(error);
                              });
                     }
-                    else
-                    {
-                        this.book.id = this.id;
-                        // Other properties set via UI or API
-                    }
 
                     this.loaded = true;
                 },
@@ -59,11 +51,11 @@
                 {
                     onSave(evt)
                     {
-                        let cmd = this.id < 0 ? axios.post("/api/books", this.book) : axios.put("/api/books/" + this.id, this.book);
+                        let cmd = this.href ? axios.put(this.href, this.book) : axios.post("/api/books", this.book);
 
                         cmd.then(response=>
                         {
-                            alert("Book " + (this.id < 0 ? "created!" : "saved!"));
+                            alert("Book " + (this.href ? "saved!" : "created!"));
                             window.location.href = "/books";
                         })
                         .catch(error=>
