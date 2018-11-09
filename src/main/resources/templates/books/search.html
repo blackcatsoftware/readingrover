@@ -49,7 +49,7 @@
                     <tbody>
                         <tr v-for="book in books" @click="onClickRow(book)">
                             <td>{{ book.title }}</td>
-                            <td>{{ book.author }}</td>
+                            <td>{{ book.authors_pretty }}</td>
                         </tr>
                     </tbody>
                     <thead>
@@ -78,15 +78,29 @@
                         axios.get(url)
                              .then(response=>
                              {
+                                this.books = [];
+
                                 let hal_books = response.data._embedded.books;
                                 for (let idx = 0; idx < hal_books.length; idx++)
                                 {
                                     let hal_book = hal_books[idx];
+                                    
+                                    let authors_full_names = [];
+                                    if (hal_book._embedded)
+                                    {
+                                        for (let idx2 = 0; idx2 < hal_book._embedded.authors.length; idx2++)
+                                        {
+                                            authors_full_names.push(hal_book._embedded.authors[idx2].full_name);
+                                        }
+                                    }
+
                                     let book =
                                     {
                                         'title': hal_book.title,
+                                        'authors_pretty': authors_full_names.join(', '),
                                         'link': hal_book._links.self.href
                                     }
+
                                     console.log(book);
                                     this.books.push(book);
                                 }

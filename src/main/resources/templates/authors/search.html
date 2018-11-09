@@ -48,7 +48,7 @@
                 <table>
                     <tbody>
                         <tr v-for="author in authors" @click="onClickRow(author)">
-                            <td>{{ author.first_name + ' ' + author.last_name }}</td>
+                            <td>{{ author.full_name }}</td>
                         </tr>
                     </tbody>
                     <thead>
@@ -84,8 +84,7 @@
                                     let hal_author = hal_authors[idx];
                                     let author =
                                     {
-                                        'first_name': hal_author.first_name,
-                                        'last_name': hal_author.last_name,
+                                        'full_name': hal_author.full_name,
                                         'link': hal_author._links.self.href
                                     }
                                     console.log(author);
@@ -112,7 +111,7 @@
                 {
                     this.onSearch();
                 }
-            })
+            });
         </script>
     </body>
 </html>
